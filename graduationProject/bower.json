@@ -1,0 +1,21 @@
+{
+  "name": "graduation-project",
+  "authors": [
+    "minjaef1003 <minjaef1003@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "install": {
+    "path": {
+      "css": "resources/css",
+      "js": "resources/js"
+    }
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "bootstrap": "^4.1.3"
+  }
+}

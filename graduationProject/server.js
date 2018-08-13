@@ -14,7 +14,9 @@ const app = express();
 const upload = multer();
 
 //미들웨어
-app.use('/static', express.static(__dirname + '/resources'));
+app.use('/resources', express.static(__dirname + '/resources'));
+app.use('/bower', express.static(__dirname + '/bower_components'));
+app.use('/npm', express.static(__dirname + '/node_modules'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use('/', route);

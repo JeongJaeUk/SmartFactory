@@ -9,6 +9,9 @@ const router = express.Router();
 router.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname, 'html', 'main.html'));
 });
+router.get('/excel', (req, res) => {
+	res.sendFile(path.join(__dirname, 'html', 'excel.html'));
+});
 router.get('/about', (req, res) => {
 	res.sendFile(path.join(__dirname, 'html', 'about.html'));
 });

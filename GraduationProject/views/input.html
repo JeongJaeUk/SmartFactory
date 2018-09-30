@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Smart Factory</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+	
+	<!-- jquery and bootstrap 
+	<script src="js/jquery.min.js" type="text/javascript"></script>
+	<script src="/js/bootstrap.min.js" type="text/javascript"></script>
+	<link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	-->
+	
+	<!-- Dashboard -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+  	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
+  	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+	<link rel="stylesheet" type="text/css" href="/static/css/keen-dashboards.css" />
+	
+	<!-- xlsx -->
+	<script lang="javascript" src="js/shim.min.js"></script>
+	<script lang="javascript" src="js/xlsx.full.min.js"></script>
+		
+	<!-- sweetalert2 -->
+	<script lang="javascript" src="js/sweetalert2.all.min.js"></script>
+	<link rel="stylesheet" href="css/sweetalert2.min.css">
+	
+	<style type="text/css">
+		table, td, th, tr{
+			border-color: gray !important;
+			text-align: center;
+			vertical-align: middle !important;
+		}
+		.glyphicon-remove {
+			color: red;
+		}
+		.glyphicon-ok {
+			color: green;
+		}
+		th {
+			background-color: lightsteelblue !important; 
+		}
+		.itemName {
+			background-color: lightblue;
+		}
+	</style>
+</head>
+<body class="keen-dashboard" style="padding-top: 80px;">
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".navbar-collapse">
+					<span class="sr-only"></span> 
+					<span class="icon-bar"></span> <span class="icon-bar"></span> 
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="../"> 
+					<span class="glyphicon glyphicon-chevron-left"></span>
+				</a> 
+				<a class="navbar-brand" href="./input">작업 계획 생성</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid" id="containerChart">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="chart-wrapper">
+					<div class="chart-title">Excel</div>
+					<div class="chart-stage">
+						<div>
+							<button type="button" class="btn btn-primary" id="replaceBtn1" style="margin-top: 10px; margin-bottom: 10px;" onclick="clickFileInput()">파일 선택 </button>
+							<p style="display: inline-block;" id="replaceFileName1">선택된 파일 없음</p>
+							<input class="hidden" type="file" name="xlfile" id="xlf" />
+						</div>
+						<div class="hidden" id="out"></div>
+					</div>
+					<div class="chart-notes">주문 목록 엑셀로 입력</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="chart-wrapper">
+					<div class="chart-title">주문 목록</div>
+					<div class="chart-stage">
+						<table class="table table-bordered table-striped" id="work">
+						</table>
+					</div>
+					<div class="chart-notes">주문한 시간과 데드라인, 우선순위, 주문번호가 포함된 주문목록</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="chart-wrapper">
+					<div class="chart-title">기계별 가용 품목</div>
+					<div class="chart-stage">
+						<table class="table table-bordered table-striped" id="machine">
+						</table>
+					</div>
+					<div class="chart-notes">기계마다 사용가능한 품목</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="chart-wrapper">
+					<div class="chart-title">품목별 공정시간</div>
+					<div class="chart-stage">
+						<table class="table table-bordered table-striped" id="itemWorkTime">
+						</table>
+					</div>
+					<div class="chart-notes">품목별 기계에서 걸리는 공정시간</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="chart-wrapper">
+					<div class="chart-title">품목별 재셋팅 시간</div>
+					<div class="chart-stage">
+						<table class="table table-bordered table-striped" id="resetingTime">
+						</table>
+					</div>
+					<div class="chart-notes">기계에서 작업하는 품목을 바꿀 때 걸리는 시간</div>
+				</div>
+			</div>
+		</div>
+		<!-- <button type="button" class="btn btn-primary hidden" id="schedulingBtn" style="margin-top: 10px; margin-bottom: 20px;" onclick="doScheduling()">작업 계획 생성</button> -->
+		<button type="button" class="btn btn-primary hidden" id="schedulingBtn" style="margin-top: 10px; margin-bottom: 20px;" onclick="addHistory()">작업 계획 생성</button>
+		
+	</div>
+	<div class="container-fluid">
+		<p class="small text-muted">
+			Built by 팀추월
+		</p>
+	</div>
+
+	<!-- script -->
+	<script type="text/javascript">
+	//temp
+	var addHistory = function() {
+		var date = new Date();
+		var fileName = "inputJson";
+
+		$.ajax({
+			url: "/addHistory",
+			type: "POST",
+			dataType: "JSON",
+			data: {resultList: jsonData, fileName: fileName},
+			success: function(response) {
+				swal(response.success, "작업 계획이 기록되었습니다.", "success");
+				closeAddHistory();
+			}, error: function(reqeuse, status, error) {
+				swal(response.error, "기록에 실패하였습니다. 다시 시도해 주십시오.", "error")
+			}
+		});
+		
+	}
+	
+	
+	//temp end
+	
+	var jsonData = {};
+	
+	var clickFileInput = function() {
+		$('input[name="xlfile"]').click();
+	}	
+
+	var fillTableWork = function(work_list) {
+		var addressNum = 1;
+		var addressAlpabet = 65; // A
+		var address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		var table = $("#work");
+		
+		var thead = $("<thead/>");
+		var tr = $("<tr/>", {
+			class: "workTableHead"
+		});
+		
+		//json workList
+		var workList = [];
+		var columnName = [];
+		
+		while(work_list[address] != undefined) {
+			var th = $("<th/>", {
+				text: work_list[address].v
+			});
+			tr.append(th);
+			
+			columnName.push(work_list[address].v);
+			
+			addressAlpabet++;
+			address = String.fromCharCode(addressAlpabet) + addressNum;
+		}
+		thead.append(tr);
+		table.append(thead);
+		
+		var tbody = $("<tbody/>");
+		
+		addressNum++;
+		addressAlpabet = 65;
+		address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		while(work_list[address] != undefined) {
+			var tr = $("<tr/>");
+			
+			//json
+			var columnNum = 0;
+			var jsonWork = {};
+			
+			while(work_list[address] != undefined) {
+				var td = $("<td/>", {
+					text: work_list[address].v
+				});
+				
+				//json
+				jsonWork[columnName[columnNum]] = work_list[address].v;
+				columnNum++;
+				
+				tr.append(td);
+				addressAlpabet++;
+				address = String.fromCharCode(addressAlpabet) + addressNum;
+			}
+			tbody.append(tr);
+			
+			addressNum++;
+			addressAlpabet = 65;
+			address = String.fromCharCode(addressAlpabet) + addressNum;
+			
+			//json
+			workList.push(jsonWork);
+			
+		}
+		
+		//json
+		jsonData.workList = workList;
+		
+		table.append(tbody);
+	}
+	var fillTableMachine = function(machine_available, item_work_time) {
+		var itemMap = new Map();
+		
+		var addressNum = 1;
+		var addressAlpabet = 65; // A
+		var address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		var itemNum = 0;
+		
+		if(item_work_time[address] == undefined){
+			console.log("item_work_time이 이상합니다.");
+			return;
+		}
+		
+		if(item_work_time[address].v == "품목명"){
+			addressNum++;
+			var address = String.fromCharCode(addressAlpabet) + addressNum;
+
+			//item_work_time, A1 품목명이 있어야함.
+			console.log("품목명이 존재합니다.");
+
+			//machineTable Head
+			var machineTableHead = $("<tr/>")
+			machineTableHead.prop("id", "machineTableHead");
+			var machineNum = $("<th/>")
+			machineNum.prop("rowspan", 2);
+			machineNum.text("기계번호");
+			var itemAvailable = $("<th/>");
+			itemAvailable.prop("id", "itemAvailable");
+			itemAvailable.text("가용품목");
+	
+			machineTableHead.append(machineNum);
+			machineTableHead.append(itemAvailable);
+			
+			//item List
+			var itemList = $("<tr/>");
+			itemList.prop("id", "itemList");
+			
+			//json itemArray
+			var itemArray = [];
+			
+ 			while(item_work_time[address] != undefined) {
+				console.log(address);
+ 				var td = $("<td/>", {
+ 					class: "itemName"
+ 				});
+ 				console.log(item_work_time[address].v);
+				td.text(item_work_time[address].v);
+ 				//가용품목 리스트 생성
+				itemList.append(td);
+				
+ 				//set map
+ 				itemMap.set(item_work_time[address].v, addressNum - 1);
+ 				//set item array
+ 				itemArray.push(item_work_time[address].v);
+ 				
+				addressNum++;
+				address = String.fromCharCode(addressAlpabet) + addressNum;
+			} 
+ 			itemAvailable.prop("colspan", addressNum - 2);
+			itemNum = addressNum - 2;
+ 			//json itemArray
+			jsonData.itemArray = itemArray;
+ 			
+ 			//thead
+ 			var thead = $("<thead/>");
+ 			thead.append(machineTableHead);
+ 			thead.append(itemList);
+ 			
+ 			$("#machine").append(thead);
+ 			
+ 			//machine_available, A1에는 기계번호가 있어야함.
+			addressNum = 1;
+ 			address = String.fromCharCode(addressAlpabet) + addressNum;
+
+ 			console.log(address);
+ 
+ 			//tbody 생성
+ 			if(machine_available[address] == undefined) {
+				console.log("machine_available이 이상합니다.");
+				return;
+ 			}
+			
+ 			//json machine
+ 			var machineArray = [];
+ 			var machineAvailable = {};
+ 			
+ 			if(machine_available[address].v == "기계번호") {
+ 				addressNum++;
+ 	 			address = String.fromCharCode(addressAlpabet) + addressNum;
+ 				
+ 	 			 	 			
+ 	 			while(machine_available[address] != undefined){
+ 	 				//tr 생성
+ 	 				var tr = $("<tr/>");
+ 	 				
+ 	 				//machineNum 생성
+ 	 				var num = $("<td/>");
+ 	 				var tdNum = machine_available[address].v;
+ 	 				num.text(tdNum);
+ 	 				tr.append(num);
+ 	 				
+ 	 				//machine Array
+ 	 				machineArray.push(machine_available[address].v);
+ 	 				var availableItem = [];
+ 	 				
+ 	 				for(var i = 0; i < itemNum; i++) {
+ 	 					var td = $("<td/>");
+ 	 					var icon = $("<span/>");
+ 	 					icon.addClass("glyphicon glyphicon-remove");
+ 	 					td.append(icon);
+ 	 					
+ 	 					tr.append(td);
+ 	 				}
+ 	 				$("#machine").append(tr);
+ 	 				
+ 	 				//O check ㄱㄱ
+ 	 				addressAlpabet++;
+ 	 				address = String.fromCharCode(addressAlpabet) + addressNum;
+ 	 				while(machine_available[address] != undefined) {
+ 	 					var item = machine_available[address].v;
+ 	 					var itemEq = itemMap.get(item);
+ 	 					tr.find("td").eq(itemEq).find("span").removeClass("glyphicon glyphicon-remove");
+ 	 					tr.find("td").eq(itemEq).find("span").addClass("glyphicon glyphicon-ok");
+ 	 					
+ 	 					//json
+ 	 					availableItem.push(machine_available[address].v);
+ 	 					
+ 	 	 				addressAlpabet++;
+ 	 	 				address = String.fromCharCode(addressAlpabet) + addressNum; 	 					
+ 	 				}
+ 	 				
+ 	 				//json
+ 	 				machineAvailable[tdNum] = availableItem;
+
+ 	 				addressAlpabet = 65;
+ 	 				addressNum++;
+ 	 				address = String.fromCharCode(addressAlpabet) + addressNum;
+ 	 			}
+ 	 			
+ 	 			//json machine
+ 	 			jsonData.machineArray = machineArray;
+ 	 			jsonData.machineAvailable = machineAvailable;
+ 	 			
+ 	 			addressNum = 1;
+ 	 			
+ 	 			
+ 			}
+		}			
+	}
+	var fillTableItemWorkTime = function(item_work_time) {
+		var addressNum = 1;
+		var addressAlpabet = 65; // A
+		var address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		var table = $("#itemWorkTime");
+		
+		var thead = $("<thead/>");
+		var tr = $("<tr/>");
+		
+		//json
+		var itemWorkTime = [];
+		
+		var thNum = 0;
+		
+		while(item_work_time[address] != undefined) {
+			var th = $("<th/>", {
+				text: item_work_time[address].v
+			});
+			tr.append(th);
+			thNum++;
+			
+			addressAlpabet++;
+			address = String.fromCharCode(addressAlpabet) + addressNum;
+		}
+		thead.append(tr);
+		table.append(thead);
+		
+		var tbody = $("<tbody/>");
+		
+		addressNum++;
+		addressAlpabet = 65;
+		address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		while(item_work_time[address] != undefined) {
+			var tr = $("<tr/>");
+			
+			//json
+			var itemWorkTimeInfo = {};
+			var itemName = ""; 
+			var processNum = 0;
+			var processTimes = [];
+			for(var i = 0; i < thNum; i++) {
+				if(item_work_time[address] != undefined) {
+					var td = $("<td/>", {
+						text: item_work_time[address].v
+					});
+					
+					//json
+					if(i == 0) {
+						itemName = item_work_time[address].v;
+					}
+					else if(i == 1) {
+						processNum = item_work_time[address].v;
+					}
+					else {
+						processTimes.push(item_work_time[address].v);
+					}
+				}
+				else {
+					var td = $("<td/>");
+				}
+				
+				tr.append(td);
+				addressAlpabet++;
+				address = String.fromCharCode(addressAlpabet) + addressNum;
+			}
+			
+
+			itemWorkTimeInfo.name = itemName;
+			itemWorkTimeInfo.processNum = processNum;
+			itemWorkTimeInfo.processTimes = processTimes;
+			
+			itemWorkTime.push(itemWorkTimeInfo);
+			
+			tbody.append(tr);
+			
+			addressNum++;
+			addressAlpabet = 65;
+			address = String.fromCharCode(addressAlpabet) + addressNum;
+		}
+		
+		//json
+		jsonData.itemWorkTime = itemWorkTime;
+		
+		table.append(tbody);
+	}
+	var fillTableResetingTime = function(resetting_time) {
+		var addressNum = 1;
+		var addressAlpabet = 65; // A
+		var address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		var table = $("#resetingTime");
+		
+		var thead = $("<thead/>");
+		var tr = $("<tr/>");
+		
+		//json
+		var resettingTime = {};
+		var columnName = [];
+		
+		while(resetting_time[address] != undefined) {
+			console.log(resetting_time[address]);
+			var th = $("<th/>", {
+				text: resetting_time[address].v
+			});
+			tr.append(th);
+			
+			//json
+			columnName.push(resetting_time[address].v);
+			
+			addressAlpabet++;
+			address = String.fromCharCode(addressAlpabet) + addressNum;
+		}
+		thead.append(tr);
+		table.append(thead);
+		
+		var tbody = $("<tbody/>");
+		
+		addressNum++;
+		addressAlpabet = 65;
+		address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		while(resetting_time[address] != undefined) {
+			var tr = $("<tr/>");
+			
+			//json
+			var columnNum = 0;
+			var rowName = "";
+			var jsonRow = {};
+			
+			while(resetting_time[address] != undefined) {
+				var td = $("<td/>", {
+					text: resetting_time[address].v
+				});
+				
+				//json
+				if(rowName == "") {
+					rowName = resetting_time[address].v;
+				}
+				else {
+					jsonRow[columnName[columnNum]] = resetting_time[address].v;
+				}
+				columnNum++;
+				
+				tr.append(td);
+				addressAlpabet++;
+				address = String.fromCharCode(addressAlpabet) + addressNum;
+			}
+			tbody.append(tr);
+			
+			//json
+			resettingTime[rowName] = jsonRow;
+			
+			addressNum++;
+			addressAlpabet = 65;
+			address = String.fromCharCode(addressAlpabet) + addressNum;
+		}
+		
+		//json
+		jsonData.resettingTime = resettingTime;
+		
+		table.append(tbody);
+	}
+	
+	var X = XLSX;
+	var XW = {
+		/* worker message */
+		msg: 'xlsx',
+		/* worker scripts */
+		worker: 'js/xlsxworker.js'
+	};
+	
+	var global_wb;
+	
+	var process_wb = (function() {
+		var OUT = document.getElementById('out');
+		
+		var get_format = (function() {
+			var radios = document.getElementsByName( "format" );
+			return function() {
+				for(var i = 0; i < radios.length; ++i) if(radios[i].checked || radios.length === 1) return radios[i].value;
+			};
+		})();
+	
+		var to_json = function to_json(workbook) {
+			var result = {};
+			workbook.SheetNames.forEach(function(sheetName) {
+				var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName], {header:1});
+				if(roa.length) result[sheetName] = roa;
+			});
+			return JSON.stringify(result, 2, 2);
+		};
+	
+		var to_csv = function to_csv(workbook) {
+			var result = [];
+			workbook.SheetNames.forEach(function(sheetName) {
+				var csv = X.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+				if(csv.length){
+					result.push("SHEET: " + sheetName);
+					result.push("");
+					result.push(csv);
+				}
+			});
+			return result.join("\n");
+		};
+	
+		var to_fmla = function to_fmla(workbook) {
+			var result = [];
+			workbook.SheetNames.forEach(function(sheetName) {
+				var formulae = X.utils.get_formulae(workbook.Sheets[sheetName]);
+				if(formulae.length){
+					result.push("SHEET: " + sheetName);
+					result.push("");
+					result.push(formulae.join("\n"));
+				}
+			});
+			return result.join("\n");
+		};
+	
+		
+		return function process_wb(wb) {
+			global_wb = wb;
+			var output = "";
+			switch(get_format()) {
+				case "form": output = to_fmla(wb); break;
+				case "html": output = to_html(wb); break;
+				case "json": output = to_json(wb); break;
+				default: output = to_csv(wb);
+			}
+			if(OUT.innerText === undefined) OUT.textContent = output;
+			else OUT.innerText = output;
+			if(typeof console !== 'undefined') console.log("output", new Date());
+		};
+	})();
+	
+	
+	
+	var do_file = (function() {
+		var rABS = typeof FileReader !== "undefined" && (FileReader.prototype||{}).readAsBinaryString;
+		var domrabsChecked = true;
+		var use_worker = typeof Worker !== 'undefined';
+		var domworkChecked = true;
+	
+		var xw = function xw(data, cb) {
+			
+			var worker = new Worker(XW.worker);
+			worker.onmessage = function(e) {
+				switch(e.data.t) {
+					case 'ready': break;
+					case 'e': console.error(e.data.d); break;
+					case XW.msg: 
+						cb(JSON.parse(e.data.d));
+						console.log(JSON.parse(e.data.d));
+						//this is data
+						fillTableWork(JSON.parse(e.data.d).Sheets.work_list);
+						fillTableMachine(JSON.parse(e.data.d).Sheets.machine_available, JSON.parse(e.data.d).Sheets.item_work_time)
+						fillTableItemWorkTime(JSON.parse(e.data.d).Sheets.item_work_time);
+						fillTableResetingTime(JSON.parse(e.data.d).Sheets.resetting_time);
+						
+						//json
+						console.log(jsonData);
+						
+						var obj_s = JSON.stringify(JSON.parse(e.data.d), null, "\t");
+
+			            var dataUri = "data:application/json;charset=utf-8,"+ encodeURIComponent(obj_s);
+        			    var link = $("#link").attr("href", dataUri);
+
+						swal("Excel 읽기 완료!", "아래 표에서 데이터를 확인하고 작업 계획 생성 버튼을 눌러 작업 계획을 생성해 주세요.", "success")
+						
+						$("#schedulingBtn").removeClass("hidden");
+						break;
+				}	
+			};
+			worker.postMessage({d:data,b:rABS?'binary':'array'});
+		};
+	
+		return function do_file(files) {
+			rABS = domrabsChecked;
+			use_worker = domworkChecked;
+			var f = files[0];
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				if(typeof console !== 'undefined') console.log("onload", new Date(), rABS, use_worker);
+				var data = e.target.result;
+				if(!rABS) data = new Uint8Array(data);
+				if(use_worker) xw(data, process_wb);
+				else process_wb(X.read(data, {type: rABS ? 'binary' : 'array'}));
+			};
+			if(rABS) reader.readAsBinaryString(f);
+			else reader.readAsArrayBuffer(f);
+		};
+	})();
+	
+	(function() {
+		var xlf = document.getElementById('xlf');
+		if(!xlf.addEventListener) return;
+		function handleFile(e) { 
+			//loading 표시
+			swal({
+				title: 'Loading...',
+				imageUrl: 'static/img/loading.gif',
+				imageSize: '400x400',
+				imageAlt: 'Custom image',
+				animation: false
+			});
+			
+			//file name 표시.
+			$('p#replaceFileName1').text(e.target.files[0].name);
+			
+			//file 선택 후 replaceBtn에 선택된 파일 이름 표기 및 버튼 색상 변경
+			$('button#replaceBtn1').text(e.target.files.name)
+			
+			do_file(e.target.files); 
+		}
+		xlf.addEventListener('change', handleFile, false);
+	})();
+	
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-36810333-1']);
+		_gaq.push(['_trackPageview']);
+	
+	</script>
+</body>
+</html>

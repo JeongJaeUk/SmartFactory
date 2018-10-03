@@ -32,6 +32,7 @@ def makeJson(machineresult, score, remainwork):
     resultList = OrderedDict()
     resultList["resultList"] = []
     resultList["columnName"] = ["주문번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량"]
+    resultList["remaincol"] = ["품목", "주문시간", "deadline", "우선순위", "주문번호", "남은공정수", "주문자", "주문수량"]
     for i in range(len(machineresult)):
         time = 0
         for j in range(machineresult[i][2]):
@@ -96,4 +97,10 @@ totalresult["greedy"] = greedy_temp
 totalresult["pso"] = pso_temp
 totalresult["psopre"] = psopre_temp
 
-print(json.dumps(totalresult, ensure_ascii=False, indent="\t"))
+temp = json.dumps(totalresult, ensure_ascii=False, indent="\t")
+
+f = open("../saveresult/result.json", 'w')
+f.write(temp)
+f.close()
+
+print(temp)

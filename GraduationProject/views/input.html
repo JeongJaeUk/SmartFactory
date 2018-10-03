@@ -142,6 +142,316 @@
 	<!-- script -->
 	<script type="text/javascript">
 	//temp
+	var writeJson = function(temp) {
+		result_filename = "resultScheduling.xlsx";
+		remain_filename = "remainScheduling.xlsx";
+		//resultList
+		var total_wb = XLSX.utils.book_new()
+			//greedy
+				//deadline
+		var greedy_deadline_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		console.log(temp);
+        for(var i = 0; i < temp["greedy"]["deadline"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["greedy"]["deadline"]["columnName"].length; j++){
+				var key = temp["greedy"]["deadline"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["greedy"]["deadline"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["greedy"]["deadline"]["resultList"][i][key];	
+				}
+			}
+			greedy_deadline_data = greedy_deadline_data.concat([temp_data_list]);
+		}
+		var gds_name = "greedy_deadline";
+		var gds_ws = XLSX.utils.aoa_to_sheet(greedy_deadline_data);
+		XLSX.utils.book_append_sheet(total_wb, gds_ws, gds_name);
+				//priority
+		var greedy_priority_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["greedy"]["priority"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["greedy"]["priority"]["columnName"].length; j++){
+				var key = temp["greedy"]["priority"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["greedy"]["priority"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["greedy"]["priority"]["resultList"][i][key];	
+				}
+			}
+			greedy_priority_data = greedy_priority_data.concat([temp_data_list]);
+		}
+		var gps_name = "greedy_priority";
+		var gps_ws = XLSX.utils.aoa_to_sheet(greedy_priority_data);
+		XLSX.utils.book_append_sheet(total_wb, gps_ws, gps_name);	
+				//combie
+		var greedy_combie_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["greedy"]["combie"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["greedy"]["combie"]["columnName"].length; j++){
+				var key = temp["greedy"]["combie"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["greedy"]["combie"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["greedy"]["combie"]["resultList"][i][key];	
+				}
+			}
+			greedy_combie_data = greedy_combie_data.concat([temp_data_list]);
+		}
+		var gcs_name = "greedy_combination";
+		var gcs_ws = XLSX.utils.aoa_to_sheet(greedy_combie_data);
+		XLSX.utils.book_append_sheet(total_wb, gcs_ws, gcs_name);
+			//pso
+				//deadline
+		var pso_deadline_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["pso"]["deadline"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["pso"]["deadline"]["columnName"].length; j++){
+				var key = temp["pso"]["deadline"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["pso"]["deadline"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["pso"]["deadline"]["resultList"][i][key];	
+				}
+			}
+			pso_deadline_data = pso_deadline_data.concat([temp_data_list]);
+		}
+		var pds_name = "pso_deadline";
+		var pds_ws = XLSX.utils.aoa_to_sheet(pso_deadline_data);
+		XLSX.utils.book_append_sheet(total_wb, pds_ws, pds_name);
+				//priority
+		var pso_priority_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["pso"]["priority"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["pso"]["priority"]["columnName"].length; j++){
+				var key = temp["pso"]["priority"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["pso"]["priority"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["pso"]["priority"]["resultList"][i][key];	
+				}
+			}
+			pso_priority_data = pso_priority_data.concat([temp_data_list]);
+		}
+		var pps_name = "pso_priority";
+		var pps_ws = XLSX.utils.aoa_to_sheet(pso_priority_data);
+		XLSX.utils.book_append_sheet(total_wb, pps_ws, pps_name);
+				//combinaition
+		var pso_combie_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["pso"]["combie"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["pso"]["combie"]["columnName"].length; j++){
+				var key = temp["pso"]["combie"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["pso"]["combie"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["pso"]["combie"]["resultList"][i][key];	
+				}
+			}
+			pso_combie_data = pso_combie_data.concat([temp_data_list]);
+		}
+		var pcs_name = "pso_combination";
+		var pcs_ws = XLSX.utils.aoa_to_sheet(pso_combie_data);
+		XLSX.utils.book_append_sheet(total_wb, pcs_ws, pcs_name);
+			//psopre
+				//deadline
+		var psopre_deadline_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["psopre"]["deadline"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["psopre"]["deadline"]["columnName"].length; j++){
+				var key = temp["psopre"]["deadline"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["psopre"]["deadline"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["psopre"]["deadline"]["resultList"][i][key];	
+				}
+			}
+			psopre_deadline_data = psopre_deadline_data.concat([temp_data_list]);
+		}
+		var prds_name = "psopre_deadline";
+		var prds_ws = XLSX.utils.aoa_to_sheet(psopre_deadline_data);
+		XLSX.utils.book_append_sheet(total_wb, prds_ws, prds_name);
+				//priority
+		var psopre_priority_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["psopre"]["priority"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["psopre"]["priority"]["columnName"].length; j++){
+				var key = temp["psopre"]["priority"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["psopre"]["priority"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["psopre"]["priority"]["resultList"][i][key];	
+				}
+			}
+			psopre_priority_data = psopre_priority_data.concat([temp_data_list]);
+		}
+		var prps_name = "psopre_priority";
+		var prps_ws = XLSX.utils.aoa_to_sheet(psopre_priority_data);
+		XLSX.utils.book_append_sheet(total_wb, prps_ws, prps_name);
+				//combinaition
+		var psopre_combie_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
+		for(var i = 0; i < temp["psopre"]["combie"]["resultList"].length; i++) {
+			var temp_data_list = new Array();
+			temp_data_list[0] = i + 1
+			for(var j = 0; j < temp["psopre"]["combie"]["columnName"].length; j++){
+				var key = temp["psopre"]["combie"]["columnName"][j];
+				if(j == 0){
+					temp_data_list[j + 10] = temp["psopre"]["combie"]["resultList"][i][key];
+				}
+				else {
+					temp_data_list[j] = temp["psopre"]["combie"]["resultList"][i][key];	
+				}
+			}
+			psopre_combie_data = psopre_combie_data.concat([temp_data_list]);
+		}
+		var prps_name = "psopre_combination";
+		var prps_ws = XLSX.utils.aoa_to_sheet(psopre_combie_data);
+		XLSX.utils.book_append_sheet(total_wb, prps_ws, prps_name);
+		
+        
+        //remain
+		var remain_total_wb = XLSX.utils.book_new()
+		var columnList = ["품목", "주문시간", "deadline", "우선순위", "주문번호", "남은공정수", "주문자", "주문수량"]
+			//greedy
+				//deadline
+		var greedy_deadline_remain = [columnList];
+		for(var i = 0; i < temp["greedy"]["deadline"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["greedy"]["deadline"]["remainWorks"][i][key];
+			}
+			greedy_deadline_remain = greedy_deadline_remain.concat([temp_data_list]);
+		}
+		var gdr_name = "greedy_deadline";
+		var gdr_ws = XLSX.utils.aoa_to_sheet(greedy_deadline_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, gdr_ws, gdr_name);
+				//priority
+		var greedy_priority_remain = [columnList];
+		for(var i = 0; i < temp["greedy"]["priority"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["greedy"]["priority"]["remainWorks"][i][key];
+			}
+			greedy_priority_remain = greedy_priority_remain.concat([temp_data_list]);
+		}
+		var gpr_name = "greedy_priority";
+		var gpr_ws = XLSX.utils.aoa_to_sheet(greedy_priority_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, gpr_ws, gpr_name);
+				//combinaition
+		var greedy_combie_remain = [columnList];
+		for(var i = 0; i < temp["greedy"]["combie"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["greedy"]["combie"]["remainWorks"][i][key];
+			}
+			greedy_combie_remain = greedy_combie_remain.concat([temp_data_list]);
+		}
+		var gcr_name = "greedy_combination";
+		var gcr_ws = XLSX.utils.aoa_to_sheet(greedy_combie_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, gcr_ws, gcr_name);
+			//pso
+				//deadline
+		var pso_deadline_remain = [columnList];
+		for(var i = 0; i < temp["pso"]["deadline"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["pso"]["deadline"]["remainWorks"][i][key];
+			}
+			pso_deadline_remain = pso_deadline_remain.concat([temp_data_list]);
+		}
+		var pdr_name = "pso_deadline";
+		var pdr_ws = XLSX.utils.aoa_to_sheet(pso_deadline_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, pdr_ws, pdr_name);
+				//priority
+		var pso_priority_remain = [columnList];
+		for(var i = 0; i < temp["pso"]["priority"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["pso"]["priority"]["remainWorks"][i][key];
+			}
+			pso_priority_remain = pso_priority_remain.concat([temp_data_list]);
+		}
+		var ppr_name = "pso_priority";
+		var ppr_ws = XLSX.utils.aoa_to_sheet(pso_priority_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, ppr_ws, ppr_name);
+				//combinaition
+		var pso_combie_remain = [columnList];
+		for(var i = 0; i < temp["pso"]["combie"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["pso"]["combie"]["remainWorks"][i][key];
+			}
+			pso_combie_remain = pso_combie_remain.concat([temp_data_list]);
+		}
+		var pcr_name = "pso_combination";
+		var pcr_ws = XLSX.utils.aoa_to_sheet(pso_combie_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, pcr_ws, pcr_name);
+			//psopre
+				//deadline
+		var psopre_deadline_remain = [columnList];
+		for(var i = 0; i < temp["psopre"]["deadline"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["psopre"]["deadline"]["remainWorks"][i][key];
+			}
+			psopre_deadline_remain = psopre_deadline_remain.concat([temp_data_list]);
+		}
+		var prdr_name = "psopre_deadline";
+		var prdr_ws = XLSX.utils.aoa_to_sheet(psopre_deadline_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, prdr_ws, prdr_name);
+				//priority
+		var psopre_priority_remain = [columnList];
+		for(var i = 0; i < temp["psopre"]["priority"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["psopre"]["priority"]["remainWorks"][i][key];
+			}
+			psopre_priority_remain = psopre_priority_remain.concat([temp_data_list]);
+		}
+		var prpr_name = "psopre_priority";
+		var prpr_ws = XLSX.utils.aoa_to_sheet(psopre_priority_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, prpr_ws, prpr_name);
+				//combinaition
+		var psopre_combie_remain = [columnList];
+		for(var i = 0; i < temp["psopre"]["combie"]["remainWorks"].length; i++) {
+			var temp_data_list = new Array();
+			for(var j = 0; j < temp["greedy"]["deadline"]["remaincol"].length; j++){
+				var key = temp["greedy"]["deadline"]["remaincol"][j];
+				temp_data_list[j] = temp["psopre"]["combie"]["remainWorks"][i][key];
+			}
+			psopre_combie_remain = psopre_combie_remain.concat([temp_data_list]);
+		}
+		var prcr_name = "psopre_combination";
+		var prcr_ws = XLSX.utils.aoa_to_sheet(psopre_combie_remain);
+		XLSX.utils.book_append_sheet(remain_total_wb, prcr_ws, prcr_name);
+				
+		XLSX.writeFile(total_wb, result_filename);
+		XLSX.writeFile(remain_total_wb, remain_filename);
+	}
+	
 	var addHistory = function() {
 		var date = new Date();
 		var fileName = "inputJson";
@@ -153,7 +463,8 @@
 			data: {resultList: jsonData, fileName: fileName},
 			success: function(response) {
 				swal(response.success, "작업 계획이 기록되었습니다.", "success");
-				closeAddHistory();
+				writeJson(response);
+				//closeAddHistory();
 			}, error: function(reqeuse, status, error) {
 				swal(response.error, "기록에 실패하였습니다. 다시 시도해 주십시오.", "error")
 			}

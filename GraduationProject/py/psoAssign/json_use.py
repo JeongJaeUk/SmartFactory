@@ -1,8 +1,8 @@
-def extract_json(file_name):
+def extract_json(input_json):
     import json
-
-    with open(file_name, encoding="utf-8") as f:
+    with open(input_json, encoding="utf-8") as f:
         data = json.load(f)
+
 
     workList = data['workList']
     available = data["machineAvailable"]

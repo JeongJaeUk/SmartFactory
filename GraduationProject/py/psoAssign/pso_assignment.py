@@ -1,9 +1,14 @@
 import psoAssign
+import json
 from psoAssign.pyswarm import pso
 from psoAssign.json_use import extract_json
 from dateutil.parser import parse
+import sys
 
-works, rest_time, machine_amount, sequence = extract_json('inputjson.json')  # 엑셀에서 데이터를 가져 옴
+input_json = './input.json'
+# input_json = json.loads(input_json)
+works, rest_time, machine_amount, sequence = extract_json(input_json)  # 엑셀에서 데이터를 가져 옴
+
 alpha = 0  # [[] for _ in range(machine_amount)]  # 전날 스케줄링 하지 않은 시간을 기록하기 위함.
 day = parse('20180811')
 
@@ -117,8 +122,7 @@ def Pretreatment(work):
             # 조건 3 : 같은 작업에서 공정 순서가 빠른 순서로만 입력된다. 뛰어넘는것도 불가능하다.
             reset = ressetingTime(m_list[machine[sort_work[i7][7] - 1]][2], sort_work[i7][6].split("_")[0])
             if m_list[machine[sort_work[i7][7] - 1]][0] - (sort_work[i7][0] + reset) >= 0 and \
-                    last_work[sort_work[i7][4] - 1][0] >= m_list[machine[sort_work[i7][7] - 1]][0] - (sort_work[i7][0]
-                                                                                                      + reset) and \
+                    last_work[sort_work[i7][4] - 1][0] >= m_list[machine[sort_work[i7][7] - 1]][0] and \
                     last_work[sort_work[i7][4] - 1][1] == int(sort_work[i7][6].split("_")[1]):
                 ###############################             조건            ###########################################
 

@@ -1,5 +1,3 @@
-import json
-
 def getAvailableMachineList(itemname, machine):
     result = []
     for i in range(len(machine)):
@@ -8,9 +6,12 @@ def getAvailableMachineList(itemname, machine):
                 result.append(machine[i][0])
     return result
 
-def extract_json(file_name):
-    with open(file_name, encoding="utf-8") as f:
+def extract_json(input_json):
+    import json
+    with open(input_json, encoding="utf-8") as f:
         data = json.load(f)
+
+    # data = json.loads(input_json)
 
     workList = data['workList']
     machine_available = data["machineAvailable"]

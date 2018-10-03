@@ -1,7 +1,9 @@
 from greedy.getJson import extract_json
+import sys
 # 기본적으로 우선으로 보는 것(deadline, 우선순위, 작업시간)이 동등하다면 주문번호를 우선으로 본다.
+data = './input.json'
 
-works_list, resetting_time, machine_amount, listOfProcess = extract_json('data.json')
+works_list, resetting_time, machine_amount, listOfProcess = extract_json(data)
 
 # 날짜
 day = 20180811
@@ -26,8 +28,7 @@ def resetTime(alpha, beta):
     return reset_time
 
 # day에 주문한 품목들
-while (works_list[dayWorkCount][3] == day):
-    dayWorkCount = dayWorkCount + 1
+dayWorkCount = len(works_list)
 
 today_list = [[] for _ in range(dayWorkCount)]
 
@@ -225,6 +226,7 @@ def getDeadlineResult():
     return machine_state_deadline, panelity_score_deadline, rest_after_deadline_result
 
 def getPriorityResult():
+
     priority_scheduling()
     panelity = 0
     for i in range(len(rest_after_priority)):

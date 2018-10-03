@@ -36,12 +36,32 @@ router.post('/addHistory', function(req, res) {
 	var fileName = req.body.fileName || req.query.fileName;
 	
 	//history에 저장
-	console.log(resultList);
 	console.log(fileName);
 	
 	var jsonData = JSON.stringify(resultList, null, 2);
 	
-	fs.writeFile('./py/input.json', jsonData, 'utf-8', function(e){
+	try {
+		fs.writeFileSync(path.join(__dirname, "/history/", fileName + ".json"), jsonData);		
+	} catch (e) {
+		// TODO: handle exception
+		console.log("err");
+		res.end('{"error" : "작업 계획 기록 추가  실패"}');
+	}
+	res.end('{"success" : "작업 계획 기록 추가 성공"}');
+});
+
+router.post('/getResult', function(req, res) {
+	console.log("getResult called");
+	
+	var resultList = req.body.resultList || req.query.resultList;
+	var fileName = req.body.fileName || req.query.fileName;
+	
+	//history에 저장
+	console.log(fileName);
+	
+	var jsonData = JSON.stringify(resultList, null, 2);
+	
+	fs.writeFile(path.join(__dirname, "/py/", "input.json"), jsonData, 'utf-8', function(e){
     if(e){
         console.log(e);
     }
@@ -50,14 +70,14 @@ router.post('/addHistory', function(req, res) {
     }
     });
     
-    var process = spawn('python',["writejson.py"],{cwd : './py/'});
+/*    var process = spawn('python',["writejson.py"],{cwd : './py/'});
     console.log("pre");
     process.stdout.on('data',function(chunk){
         var textChunk = chunk.toString('utf8'); // buffer to string
     });
 
 	console.log("end");
-
+*/
     var resultJson = JSON.parse(fs.readFileSync(path.join(__dirname, "/saveresult/", "result.json"), 'utf-8'));
     res.json(resultJson);
     res.end();

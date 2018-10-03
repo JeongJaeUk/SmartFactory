@@ -129,8 +129,8 @@
 				</div>
 			</div>
 		</div>
-		<!-- <button type="button" class="btn btn-primary hidden" id="schedulingBtn" style="margin-top: 10px; margin-bottom: 20px;" onclick="doScheduling()">작업 계획 생성</button> -->
-		<button type="button" class="btn btn-primary hidden" id="schedulingBtn" style="margin-top: 10px; margin-bottom: 20px;" onclick="addHistory()">작업 계획 생성</button>
+
+		<button type="button" class="btn btn-primary hidden" id="schedulingBtn" style="margin-top: 10px; margin-bottom: 20px;" onclick="getResult()">작업 계획 생성</button>
 		
 	</div>
 	<div class="container-fluid">
@@ -144,13 +144,13 @@
 	//temp
 	var writeJson = function(temp) {
 		result_filename = "resultScheduling.xlsx";
-		remain_filename = "remainScheduling.xlsx";
+
 		//resultList
 		var total_wb = XLSX.utils.book_new()
-			//greedy
-				//deadline
+		//greedy
+			//deadline
 		var greedy_deadline_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
-		console.log(temp);
+	
         for(var i = 0; i < temp["greedy"]["deadline"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
 			temp_data_list[0] = i + 1
@@ -168,7 +168,7 @@
 		var gds_name = "greedy_deadline";
 		var gds_ws = XLSX.utils.aoa_to_sheet(greedy_deadline_data);
 		XLSX.utils.book_append_sheet(total_wb, gds_ws, gds_name);
-				//priority
+			//priority
 		var greedy_priority_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["greedy"]["priority"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -187,7 +187,7 @@
 		var gps_name = "greedy_priority";
 		var gps_ws = XLSX.utils.aoa_to_sheet(greedy_priority_data);
 		XLSX.utils.book_append_sheet(total_wb, gps_ws, gps_name);	
-				//combie
+			//combie
 		var greedy_combie_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["greedy"]["combie"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -206,8 +206,8 @@
 		var gcs_name = "greedy_combination";
 		var gcs_ws = XLSX.utils.aoa_to_sheet(greedy_combie_data);
 		XLSX.utils.book_append_sheet(total_wb, gcs_ws, gcs_name);
-			//pso
-				//deadline
+		//pso
+			//deadline
 		var pso_deadline_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["pso"]["deadline"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -226,7 +226,7 @@
 		var pds_name = "pso_deadline";
 		var pds_ws = XLSX.utils.aoa_to_sheet(pso_deadline_data);
 		XLSX.utils.book_append_sheet(total_wb, pds_ws, pds_name);
-				//priority
+			//priority
 		var pso_priority_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["pso"]["priority"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -245,7 +245,7 @@
 		var pps_name = "pso_priority";
 		var pps_ws = XLSX.utils.aoa_to_sheet(pso_priority_data);
 		XLSX.utils.book_append_sheet(total_wb, pps_ws, pps_name);
-				//combinaition
+			//combinaition
 		var pso_combie_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["pso"]["combie"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -264,8 +264,8 @@
 		var pcs_name = "pso_combination";
 		var pcs_ws = XLSX.utils.aoa_to_sheet(pso_combie_data);
 		XLSX.utils.book_append_sheet(total_wb, pcs_ws, pcs_name);
-			//psopre
-				//deadline
+		//psopre
+			//deadline
 		var psopre_deadline_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["psopre"]["deadline"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -284,7 +284,7 @@
 		var prds_name = "psopre_deadline";
 		var prds_ws = XLSX.utils.aoa_to_sheet(psopre_deadline_data);
 		XLSX.utils.book_append_sheet(total_wb, prds_ws, prds_name);
-				//priority
+			//priority
 		var psopre_priority_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["psopre"]["priority"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -303,7 +303,7 @@
 		var prps_name = "psopre_priority";
 		var prps_ws = XLSX.utils.aoa_to_sheet(psopre_priority_data);
 		XLSX.utils.book_append_sheet(total_wb, prps_ws, prps_name);
-				//combinaition
+			//combinaition
 		var psopre_combie_data = [["작업번호", "품목명", "공정번호", "배정기계", "시작시간", "종료시간", "공정시간", "재셋팅시간", "주문자", "주문수량", "주문번호"]];
 		for(var i = 0; i < temp["psopre"]["combie"]["resultList"].length; i++) {
 			var temp_data_list = new Array();
@@ -322,7 +322,12 @@
 		var prps_name = "psopre_combination";
 		var prps_ws = XLSX.utils.aoa_to_sheet(psopre_combie_data);
 		XLSX.utils.book_append_sheet(total_wb, prps_ws, prps_name);
-		
+						
+		XLSX.writeFile(total_wb, result_filename);
+	}
+	
+	var writeRemain = function(temp) {
+		remain_filename = "remainScheduling.xlsx";
         
         //remain
 		var remain_total_wb = XLSX.utils.book_new()
@@ -448,30 +453,33 @@
 		var prcr_ws = XLSX.utils.aoa_to_sheet(psopre_combie_remain);
 		XLSX.utils.book_append_sheet(remain_total_wb, prcr_ws, prcr_name);
 				
-		XLSX.writeFile(total_wb, result_filename);
+		
 		XLSX.writeFile(remain_total_wb, remain_filename);
+		
 	}
 	
-	var addHistory = function() {
+	var getResult = function() {
 		var date = new Date();
 		var fileName = "inputJson";
 
 		$.ajax({
-			url: "/addHistory",
+			url: "/getResult",
 			type: "POST",
 			dataType: "JSON",
 			data: {resultList: jsonData, fileName: fileName},
 			success: function(response) {
-				swal(response.success, "작업 계획이 기록되었습니다.", "success");
+				console.log(response);
 				writeJson(response);
-				//closeAddHistory();
+				writeRemain(response);
+				swal(response.success, "작업 계획이 기록되었습니다.", "success").then(function() {
+					
+				});
 			}, error: function(reqeuse, status, error) {
 				swal(response.error, "기록에 실패하였습니다. 다시 시도해 주십시오.", "error")
 			}
 		});
 		
 	}
-	
 	
 	//temp end
 	
@@ -563,16 +571,12 @@
 		var itemNum = 0;
 		
 		if(item_work_time[address] == undefined){
-			console.log("item_work_time이 이상합니다.");
 			return;
 		}
 		
 		if(item_work_time[address].v == "품목명"){
 			addressNum++;
 			var address = String.fromCharCode(addressAlpabet) + addressNum;
-
-			//item_work_time, A1 품목명이 있어야함.
-			console.log("품목명이 존재합니다.");
 
 			//machineTable Head
 			var machineTableHead = $("<tr/>")
@@ -595,11 +599,9 @@
 			var itemArray = [];
 			
  			while(item_work_time[address] != undefined) {
-				console.log(address);
  				var td = $("<td/>", {
  					class: "itemName"
  				});
- 				console.log(item_work_time[address].v);
 				td.text(item_work_time[address].v);
  				//가용품목 리스트 생성
 				itemList.append(td);
@@ -627,12 +629,9 @@
  			//machine_available, A1에는 기계번호가 있어야함.
 			addressNum = 1;
  			address = String.fromCharCode(addressAlpabet) + addressNum;
-
- 			console.log(address);
  
  			//tbody 생성
  			if(machine_available[address] == undefined) {
-				console.log("machine_available이 이상합니다.");
 				return;
  			}
 			
@@ -805,7 +804,6 @@
 		var columnName = [];
 		
 		while(resetting_time[address] != undefined) {
-			console.log(resetting_time[address]);
 			var th = $("<th/>", {
 				text: resetting_time[address].v
 			});
@@ -956,16 +954,13 @@
 					case 'e': console.error(e.data.d); break;
 					case XW.msg: 
 						cb(JSON.parse(e.data.d));
-						console.log(JSON.parse(e.data.d));
 						//this is data
 						fillTableWork(JSON.parse(e.data.d).Sheets.work_list);
 						fillTableMachine(JSON.parse(e.data.d).Sheets.machine_available, JSON.parse(e.data.d).Sheets.item_work_time)
 						fillTableItemWorkTime(JSON.parse(e.data.d).Sheets.item_work_time);
 						fillTableResetingTime(JSON.parse(e.data.d).Sheets.resetting_time);
 						
-						//json
-						console.log(jsonData);
-						
+						//json						
 						var obj_s = JSON.stringify(JSON.parse(e.data.d), null, "\t");
 
 			            var dataUri = "data:application/json;charset=utf-8,"+ encodeURIComponent(obj_s);

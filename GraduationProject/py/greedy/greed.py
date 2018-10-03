@@ -267,9 +267,9 @@ def getCombiResult():
 
     for i in range(len(rest_after_combi_result)):
         if (rest_after_combi_result[i][2] - day) >= 0:
-            panelity = panelity + (6-rest_after_priority_result[i][3]) + ((rest_after_combi_result[i][2] - day) * (rest_after_combi_result[i][2] - day))
+            panelity = panelity + (6-rest_after_combi_result[i][3]) + ((rest_after_combi_result[i][2] - day) * (rest_after_combi_result[i][2] - day))
         else:
-            panelity = panelity + (6 - rest_after_priority_result[i][3]) - ((rest_after_combi_result[i][2] - day) * (rest_after_combi_result[i][2] - day))
+            panelity = panelity + (6 - rest_after_combi_result[i][3]) - ((rest_after_combi_result[i][2] - day) * (rest_after_combi_result[i][2] - day))
 
     panelity_score_combi = panelity
 

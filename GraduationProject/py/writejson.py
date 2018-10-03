@@ -4,29 +4,12 @@ from greedy.greed import getDeadlineResult
 from greedy.greed import getPriorityResult
 from greedy.greed import getCombiResult
 from psoAssign.pso_assignment import pso_result
-# from psoAssign.pso_assignment import Dday
-# from psoAssign.pso_assignment import combination
-# from psoAssign.pso_assignment import pre_priority
-# from psoAssign.pso_assignment import pre_Dday
-# from psoAssign.pso_assignment import pre_combination
 
 greedy_deadline_machine_result, greedy_deadline_score, greedy_deadline_remain_works = getDeadlineResult()
 greedy_priority_machine_result, greedy_priority_score, greedy_priority_remain_works = getPriorityResult()
 greedy_combi_machine_result, greedy_combi_score, greedy_combi_remain_works = getCombiResult()
 
 pso_priority_machine_result, pso_priority_score, pso_priority_remain_works, pso_deadline_machine_result, pso_deadline_score, pso_deadline_remain_works, pso_combi_machine_result, pso_combi_score, pso_combi_remain_works, psopre_priority_machine_result, psopre_priority_score, psopre_priority_remain_works, psopre_deadline_machine_result, psopre_deadline_score, psopre_deadline_remain_works, psopre_combi_machine_result, psopre_combi_score, psopre_combi_remain_works = pso_result()
-
-# pso_deadline_machine_result, pso_deadline_score, pso_deadline_remain_works = Dday(True)
-# pso_priority_machine_result, pso_priority_score, pso_priority_remain_works = priority(True)
-# pso_combi_machine_result, pso_combi_score, pso_combi_remain_works = combination(True)
-#
-# Dday_optimal_score = 2 ** 63  # optimal
-# pri_optimal_score = 2 ** 63  # optimal
-# comb_optimal_score = 2 ** 63  # optimal
-#
-# psopre_deadline_machine_result, psopre_deadline_score, psopre_deadline_remain_works = Dday(False)
-# psopre_priority_machine_result, psopre_priority_score, psopre_priority_remain_works = priority(False)
-# psopre_combi_machine_result, psopre_combi_score, psopre_combi_remain_works = combination(False)
 
 
 def convertTime(time):

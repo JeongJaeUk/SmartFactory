@@ -43,6 +43,9 @@
 			border: 1px solid #d6d6d6;
 			table-layout: fixed;
 		}
+		table.bb-tooltip td, table.bb-tooltip th, table.bb-tooltip tr{
+			text-align: left;
+		}
 		.glyphicon-remove {
 			color: red;
 		}
@@ -62,9 +65,6 @@
 	    .addHistory {
 	    	overflow: auto;
 	    }
-	    .hour, .last, .machine {
-	    	
-	    }
 	    td, th, tr{
 	    	height: 30px;
 	    	min-width: 8px; 
@@ -78,7 +78,33 @@
 	    	height: 30.4px;
 	    	text-align: center;
 	    }
-	    #XAxisTickPosition .bb-axis-x line, #XAxisTickPosition .bb-axis-x path { visibility: hidden; }
+	    .toolTipName, .toolTipValue {
+	    	font-size: 13px;
+	    	padding: 0px;
+	    }
+	    .toolTipTitle {
+	    	margin-top: 0px;
+	    	margin-bottom: 0px;
+	    	
+	    }
+	    .modal-backdrop { 
+		    background-color: transparent !important; 
+		} 
+		.chart-title {
+			color: black !important;
+			font-size: 18px !important;
+			font-weight: 500 !important;
+		}
+		.dayWorkTable-nav {
+			background-color: #428BCA; 
+			border-color: #357ebd; 
+			color: white ;
+		}
+		.dayWorkTable-nav .navbar-nav>.open>a{
+			background-color: #357ebd !important;
+			border-color: #357ebd; 
+			color: black;
+		}
 	</style>
 </head>
 <body class="keen-dashboard" style="padding-top: 80px;">
@@ -94,20 +120,71 @@
 				<a class="navbar-brand" href="../"> 
 					<span class="glyphicon glyphicon-chevron-left"></span>
 				</a> 
-				<a class="navbar-brand" href="./input">작업 계획 확인</a>
+				<a class="navbar-brand" href="./output">작업 계획 확인</a>
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav navbar-left">
 					<!-- 여기에 각 그래프 목록들  -->
-					<<!-- li><a href="./machine">기계별 작업 계획</a></li> -->
+					<li><a href="#">기계별 작업 계획</a></li>
 				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal workInfo">
+		<div class="modal-dialog modal-sm" style="position: absoulute;" id="toolTipDialog">
+			<div class="modal-content" id="toolTipContent" style="width: 450px; ">
+				<div class="modal-header" style="height: 50px; padding-left: 15px; padding-top: 15px">
+    				<div class="modal-title">
+     					<h3 class="toolTipTitle"></h3>
+     				</div>
+     			</div>
+     			<div class="modal-body" style="padding: 10px;">
+     				<table class="table table-striped" style="margin-bottom: 0px;">
+				        <tbody>
+				        	<tr class="toolTipNumber">
+				        		<th></th>
+				            </tr>
+				            <tr class="toolTipItemName">
+				                <th class="toolTipName">품목명</th>
+				            </tr>
+				            <tr class="toolTipProcessNum">
+				                <th class="toolTipName">공정번호</th>
+				            </tr>
+				            <tr class="toolTipMachine">
+				                <th class="toolTipName">배정기계</th>
+				            </tr>
+				            <tr class="toolTipStartTime">
+				                <th class="toolTipName">시작시간</th>
+				            </tr>
+				            <tr class="toolTipEndTime">
+				                <th class="toolTipName">종료시간</th>
+				            </tr>
+				            <tr class="toolTipProcessTime">
+				                <th class="toolTipName">공정시간(분)</th>
+				            </tr>
+				            <tr class="toolTipResettingTime">
+				                <th class="toolTipName">재셋팅시간(분)</th>
+				            </tr>
+				            <tr class="toolTipOrder">
+				                <th class="toolTipName">주문자</th>
+				            </tr>
+				            <tr class="toolTipCount">
+				                <th class="toolTipName">주문수량</th>
+				            </tr>
+				            <tr class="toolTipOrderNum">
+				                <th class="toolTipName">주문번호</th>
+				            </tr>
+				        </tbody>
+				    </table>
+     			</div>
 			</div>
 		</div>
 	</div>
 
 	<div class="modal history">
 		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
+			<div class="modal-content" style="left: -100px; width: 1000px;">
 				<div class="modal-header">
     				<div class="modal-title">
      					<h3>작업 계획 기록</h3>
@@ -123,10 +200,73 @@
 							</thead>
 						</table>
 					</div>
-     				<table class="table table-bordered table-striped" id="history">
-					</table>
+     				<div class="modal-body">
+						<div class="hidden" id="historyDiv">
+		   					<!-- Nav tabs -->
+							<ul class="nav nav-tabs" role="tablist">
+								<li class="active"><a href="#history_greedy_table" role="tab" data-toggle="tab">Greedy</a></li>
+								<li><a href="#history_pso_table" role="tab" data-toggle="tab">PSO</a></li>
+								<li><a href="#history_psopre_table" role="tab" data-toggle="tab">기존 PSO</a></li>
+								<li><a href="#historyFooterDiv" role="menu" style="float: right;"><span class="caret"></span></a></li>
+							</ul>
+							<!-- Tab panes -->
+							<div class="tab-content">
+								<div class="tab-pane active" id="history_greedy_table">
+									<div class="historyTable">
+										<h3 class="historyTableTitle">Greedy Deadline</h3>
+										<table class="table table-bordered table-striped" id="history_greedy_deadline">
+										</table>
+									</div>
+									<div class="historyTable">
+										<h3 class="historyTableTitle">Greedy Priority</h3>
+										<table class="table table-bordered table-striped" id="history_greedy_priority">
+										</table>
+									</div>
+									<div class="historyTable">
+										<h3 class="historyTableTitle">Greedy Combination</h3>
+										<table class="table table-bordered table-striped" id="history_greedy_combination">
+										</table>
+									</div>
+								</div>
+								<div class="tab-pane" id="history_pso_table">
+									<div class="historyTable">
+										<h3 class="historyTableTitle">PSO Deadline</h3>
+										<table class="table table-bordered table-striped" id="history_pso_deadline">
+										</table>
+									</div>
+									<div class="historyTable">
+										<h3 class="historyTableTitle">PSO Priority</h3>
+										<table class="table table-bordered table-striped" id="history_pso_priority">
+										</table>
+									</div>
+									<div class="historyTable">
+										<h3 class="historyTableTitle">PSO combination</h3>
+										<table class="table table-bordered table-striped" id="history_pso_combination">
+										</table>
+									</div>
+								</div>
+								<div class="tab-pane" id="history_psopre_table">
+									<div class="historyTable">
+										<h3 class="historyTableTitle">기존 PSO Deadline</h3>
+										<table class="table table-bordered table-striped" id="history_psopre_deadline">
+										</table>
+									</div>
+									<div class="historyTable">
+										<h3 class="historyTableTitle">기존 PSO Priority</h3>
+										<table class="table table-bordered table-striped" id="history_psopre_priority">
+										</table>
+									</div>
+									<div class="historyTable">
+										<h3 class="historyTableTitle">기존 PSO Combination</h3>
+										<table class="table table-bordered table-striped" id="history_psopre_combination">
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+	     			</div>
      			</div>
-     			<div class="modal-footer">
+     			<div class="modal-footer" id="historyFooterDiv">
      				<button type="button" class="btn btn-primary" id="showHistoryBtn" style="float:left; margin-bottom: 10px;" onclick="showHistory()">작업 계획 기록 목록 갱신</button>
      				<button type="button" class="btn btn-primary" id="showModalAddHistoryBtn" style="float:left; margin-bottom: 10px;" onclick="showModalAddHistory()">작업 계획 기록 추가</button>
      				<button type="button" class="btn btn-primary hidden" id="visualizeBtn" style="margin-bottom: 10px;" onclick="visualize()">시각화</button>
@@ -138,23 +278,81 @@
 	
 	<div class="modal addHistory">
 		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
+			<div class="modal-content"  style="left: -100px; width: 1000px;">
 				<div class="modal-header">
     				<div class="modal-title">
-     					<h3>작업 계획 기록 추가</h3>
+    					<h3>작업 계획 기록 추가</h3>
      				</div>
      			</div>
      			<div class="modal-body">
 					<input class="hidden" type="file" name="xlfile" id="xlf" />
-					<div class="hidden" id="out"></div>
-					
 					<div class="chart-stage hidden" id="workDiv">
-						<table class="table table-bordered table-striped" id="work">
-						</table>
+	   					<!-- Nav tabs -->
+						<ul class="nav nav-tabs" role="tablist">
+							<li class="active"><a href="#greedy_table" role="tab" data-toggle="tab">Greedy</a></li>
+							<li><a href="#pso_table" role="tab" data-toggle="tab">Pso</a></li>
+							<li><a href="#psopre_table" role="tab" data-toggle="tab">기존 PSO</a></li>
+							<li><a href="#addHistoryFooterDiv" role="menu" style="float: right;"><span class="caret"></span></a></li>
+						</ul>
+						
+						<!-- Tab panes -->
+						<div class="tab-content">
+							<div class="tab-pane active" id="greedy_table">
+								<div class="workTable">
+									<h3 class="workTableTitle">Greedy Deadline</h3>
+									<table class="table table-bordered table-striped" id="greedy_deadline">
+									</table>
+								</div>
+								<div class="workTable">
+									<h3 class="workTableTitle">Greedy Priority</h3>
+									<table class="table table-bordered table-striped" id="greedy_priority">
+									</table>
+								</div>
+								<div class="workTable">
+									<h3 class="workTableTitle">Greedy Combination</h3>
+									<table class="table table-bordered table-striped" id="greedy_combination">
+									</table>
+								</div>
+							</div>
+							<div class="tab-pane" id="pso_table">
+								<div class="workTable">
+									<h3 class="workTableTitle">PSO Deadline</h3>
+									<table class="table table-bordered table-striped" id="pso_deadline">
+									</table>
+								</div>
+								<div class="workTable">
+									<h3 class="workTableTitle">PSO Priority</h3>
+									<table class="table table-bordered table-striped" id="pso_priority">
+									</table>
+								</div>
+								<div class="workTable">
+									<h3 class="workTableTitle">PSO combination</h3>
+									<table class="table table-bordered table-striped" id="pso_combination">
+									</table>
+								</div>
+							</div>
+							<div class="tab-pane" id="psopre_table">
+								<div class="workTable">
+									<h3 class="workTableTitle">기존 PSO Deadline</h3>
+									<table class="table table-bordered table-striped" id="psopre_deadline">
+									</table>
+								</div>
+								<div class="workTable">
+									<h3 class="workTableTitle">기존 PSO Priority</h3>
+									<table class="table table-bordered table-striped" id="psopre_priority">
+									</table>
+								</div>
+								<div class="workTable">
+									<h3 class="workTableTitle">기존 PSO Combination</h3>
+									<table class="table table-bordered table-striped" id="psopre_combination">
+									</table>
+								</div>
+							</div>
+						</div>
 					</div>
-    				
+					<div class="hidden" id="out"></div>    				
      			</div>
-     			<div class="modal-footer">
+     			<div class="modal-footer" id="addHistoryFooterDiv">
 					<button type="button" class="btn btn-primary" id="replaceBtn1" style="margin-top: 10px; margin-bottom: 10px;" onclick="clickFileInput()">파일 선택 </button>
 					<p style="display: inline-block;" id="replaceFileName1">선택된 파일 없음</p>
 					<button type="button" class="btn btn-primary hidden" id="addHistoryBtn" style="margin-bottom: 5px;" onclick="addHistory()">기록 추가</button>     				
@@ -164,165 +362,166 @@
 		</div>
 	</div>
 	
-	<ul>
+	<ul class="selectHistoryDiv">
 		<li>
 			<button type="button" class="btn btn-primary" id="selectHistoryBtn" style="margin-bottom: 10px;" onclick="selectHistory()">작업 계획 선택</button>
 		</li>
 	</ul>
 	
 	<div class="container-fluid" id="containerChart">
-		
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="chart-wrapper">
-					<div class="chart-title">하루 작업 계획</div>
+					<div class="chart-title">기계별 하루 작업 계획</div>
 					
 					<div class="chart-stage">
 						<div id="chart-stage">
-							<div id="dayWorkTableHead" class="hidden"> 
-								<table class="table"" id="hourHead">
+							<div id="dayWorkTableDiv" class="hidden"> 
+								<nav id="dayWorkTable-navbar" class="navbar navbar-default navbar-static dayWorkTable-nav" role="navigation" style="background-color: #428BCA; border-color: #357ebd; color: white;">
+									<div class="container-fluid">
+										<div class="navbar-header">
+								        	<a class="navbar-brand" id="dayWorkTableCurState" style="width:220px; color:white;">Greedy_Deadline</a>
+								        </div>
+										<div class="collapse navbar-collapse dayWorkTableNavbar" style="padding: 0px;">
+											<ul class="nav navbar-nav">
+												<li class="dropdown">
+													<a id="drop1" href="#" role="button" class="dropdown-toggle dayWorkTable-nav" data-toggle="dropdown" style="background-color: #428BCA; border-color: #357ebd; color: white;">Greedy<span class="caret"></span></a>
+													<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('greedy_deadline')">Deadline</a></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('greedy_priority')">Priority</a></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('greedy_combination')">Combination</a></li>
+													</ul>
+												</li>
+												<li class="dropdown">
+													<a href="#" id="drop2" role="button" class="dropdown-toggle dayWorkTable-nav" data-toggle="dropdown" style="background-color: #428BCA; border-color: #357ebd; color: white;">PSO<span class="caret"></span></a>
+													<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('pso_deadline')">Deadline</a></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('pso_priority')">Priority</a></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('pso_combination')">Combination</a></li>
+													</ul>
+												</li>
+												<li id="fat-menu" class="dropdown">
+													<a href="#" id="drop3" role="button" class="dropdown-toggle dayWorkTable-nav" data-toggle="dropdown" style="background-color: #428BCA; border-color: #357ebd; color: white;">기존 PSO<span class="caret"></span></a>
+													<ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('psopre_deadline')">Deadline</a></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('psopre_priority')">Priority</a></li>
+														<li role="presentation"><a role="menuitem" tabindex="-1" onclick="createDayWorkTable('psopre_combination')">Combination</a></li>
+													</ul>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</nav>
+								<table class="table" id="hourHead">
 									<tbody>
 										<tr class="hours" >
-											<th class="last" colspan="3"> </th>
-											<td class="hour" colspan="6">0시</td>
-											<td class="hour" colspan="6">1:00</td>
-											<td class="hour" colspan="6">2:00</td>
-											<td class="hour" colspan="6">3:00</td>
-											<td class="hour" colspan="6">4:00</td>
-											<td class="hour" colspan="6">5:00</td>
-											<td class="hour" colspan="6">6:00</td>
-											<td class="hour" colspan="6">7:00</td>
-											<td class="hour" colspan="6">8:00</td>
-											<td class="hour" colspan="6">9:00</td>
-											<td class="hour" colspan="6">10:00</td>
-											<td class="hour" colspan="6">11:00</td>
-											<td class="hour" colspan="6">12:00</td>
-											<td class="hour" colspan="6">13:00</td>
-											<td class="hour" colspan="6">14:00</td>
-											<td class="hour" colspan="6">15:00</td>
-											<td class="hour" colspan="6">16:00</td>
-											<td class="hour" colspan="6">17:00</td>
-											<td class="hour" colspan="6">18:00</td>
-											<td class="hour" colspan="6">19:00</td>
-											<td class="hour" colspan="6">20:00</td>
-											<td class="hour" colspan="6">21:00</td>
-											<td class="hour" colspan="6">22:00</td>
-											<td class="hour" colspan="6">23:00</td>
-											<td class="hour" colspan="6">24:00</td>
+											<th class="last" colspan="3">#</th>
+											<th class="hour" colspan="6">0시</th>
+											<th class="hour" colspan="6">1시</th>
+											<th class="hour" colspan="6">2시</th>
+											<th class="hour" colspan="6">3시</th>
+											<th class="hour" colspan="6">4시</th>
+											<th class="hour" colspan="6">5시</th>
+											<th class="hour" colspan="6">6시</th>
+											<th class="hour" colspan="6">7시</th>
+											<th class="hour" colspan="6">8시</th>
+											<th class="hour" colspan="6">9시</th>
+											<th class="hour" colspan="6">10시</th>
+											<th class="hour" colspan="6">11시</th>
+											<th class="hour" colspan="6">12시</th>
+											<th class="hour" colspan="6">13시</th>
+											<th class="hour" colspan="6">14시</th>
+											<th class="hour" colspan="6">15시</th>
+											<th class="hour" colspan="6">16시</th>
+											<th class="hour" colspan="6">17시</th>
+											<th class="hour" colspan="6">18시</th>
+											<th class="hour" colspan="6">19시</th>
+											<th class="hour" colspan="6">20시</th>
+											<th class="hour" colspan="6">21시</th>
+											<th class="hour" colspan="6">22시</th>
+											<th class="hour" colspan="6">23시</th>
+											<th class="hour" colspan="6">24시</th>
 										</tr>
 									</tbody>
 								</table>
-							</div>
-							<div class="dayWorkTableToolTip" style="position: absolute; display:none;">
-								<table>
-									<tbody>
-										<tr class="toolTipTitle" colspan="2">
-										</tr>
-										<tr class="toolTipItemName">
-											<td class="name">품목명</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTipProcessNum">
-											<td class="name">공정번호</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTip">
-											<td class="name">배정기계</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTip">
-											<td class="name">시작시간</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTip">
-											<td class="name">종료시간</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTip">
-											<td class="name">공정시간(분)</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTip">
-											<td class="name">재셋팅시간(분)</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTip">
-											<td class="name">주문자</td>
-											<td class="value"></td>
-										</tr>
-										<tr class="toolTip">
-											<td class="name">주문수량</td>
-											<td class="value"></td>
-										</tr>
-										
-									</tbody>
-								</table>								
-							</div>
+							</div>				
+							
 						</div>
-					 <div class="chart-notes">24시간 동안의 각 기계들의 작업 계획</div>
+					 	<div class="chart-notes">24시간 동안의 각 기계들의 작업 계획, 색상은 주문번호에 따라 배정됩니다.</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="btn-group-group hidden" style="margin-top: 30px;">
+			<div class="btn-group greedy" data-toggle="buttons" style="margin-bottom: 10px;">
+				<label class="btn btn-primary" onclick="setCompareDate('greedy', 'deadline', !$(this).children('input').prop('checked'), 0)">
+					<input type="checkbox" name="btnForCompare" id="btnGreedyDeadline"> Greedy Deadline
+				</label>
+				<label class="btn btn-primary" onclick="setCompareDate('greedy', 'priority', !$(this).children('input').prop('checked'), 1)">
+					<input type="checkbox" name="btnForCompare" id="btnGreedyPriority"> Greedy Priority
+				</label>
+				<label class="btn btn-primary" onclick="setCompareDate('greedy', 'combination', !$(this).children('input').prop('checked'), 2)">
+					<input type="checkbox" name="btnForCompare" id="btnGreedyCombination"> Greedy Combination
+				</label>
+			</div>
+			<div class="btn-group pso" data-toggle="buttons" style="margin-bottom: 10px;">
+				<label class="btn btn-primary" onclick="setCompareDate('pso', 'deadline', !$(this).children('input').prop('checked'), 3)">
+					<input type="checkbox" name="btnForCompare" id="btnPSODeadline"> PSO Deadline
+				</label>
+				<label class="btn btn-primary" onclick="setCompareDate('pso', 'priority', !$(this).children('input').prop('checked'), 4)">
+					<input type="checkbox" name="btnForCompare" id="btnPSOPriority"> PSO Priority
+				</label>
+				<label class="btn btn-primary" onclick="setCompareDate('pso', 'combination', !$(this).children('input').prop('checked'), 5)">
+					<input type="checkbox" name="btnForCompare" id="btnPSOCombination"> PSO Combination
+				</label>
+			</div>
+			<div class="btn-group psopre" data-toggle="buttons" style="margin-bottom: 10px;">
+				<label class="btn btn-primary" onclick="setCompareDate('psopre', 'deadline', !$(this).children('input').prop('checked'), 6)">
+					<input type="checkbox" name="btnForCompare" id="btnPSOPreDeadline"> 기존 PSO Deadline
+				</label>
+				<label class="btn btn-primary" onclick="setCompareDate('psopre', 'priority', !$(this).children('input').prop('checked'), 7)">
+					<input type="checkbox" name="btnForCompare" id="btnPSOPrePriority"> 기존 PSO Priority
+				</label>
+				<label class="btn btn-primary" onclick="setCompareDate('psopre', 'combination', !$(this).children('input').prop('checked'), 8)">
+					<input type="checkbox" name="btnForCompare" id="btnPSOPreCombination"> 기존 PSO Combination
+				</label>
+			</div>
+		</div>
+		
+		
+		<div class="row">
+			<div class="col-sm-12 ">
+				<div class="chart-wrapper">
+					<div class="chart-title">기계별 총 작업 시간 비교 그래프</div>
+					<div class="chart-stage">
+						
+						<div id="BarChartForItem"></div>
+					</div>
+					<div class="chart-notes">각 기준에 따른 기계별 총 작업 시간 비교</div>
+				</div>
+			</div>
+			
+			<div class="col-sm-6">
+				<div class="chart-wrapper">
+					<div class="chart-title">Cell Title</div>
+					<div class="chart-stage">
+						<div id="AreaChartForMachine"></div>
+					</div>
+					<div class="chart-notes">Notes about this chart</div>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="chart-wrapper">
+					<div class="chart-title">Cell Title</div>
+					<div class="chart-stage">
+						<div id="AreaChartForOrder"></div>
+					</div>
+					<div class="chart-notes">Notes about this chart</div>
 				</div>
 			</div>
 			
 		</div>
-
-		<div class="row">
-			<div class="col-sm-6 col-md-4">
-				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
-					<div class="chart-stage">
-						<div id="XAxisTickPosition"></div>
-					</div>
-					<div class="chart-notes">Notes about this chart</div>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-4">
-				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
-					<div class="chart-stage">
-						<img data-src="holder.js/100%x120/white">
-					</div>
-					<div class="chart-notes">Notes about this chart</div>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-4">
-				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
-					<div class="chart-stage">
-						<img data-src="holder.js/100%x120/white">
-					</div>
-					<div class="chart-notes">Notes about this chart</div>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-4">
-				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
-					<div class="chart-stage">
-						<img data-src="holder.js/100%x120/white">
-					</div>
-					<div class="chart-notes">Notes about this chart</div>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-4">
-				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
-					<div class="chart-stage">
-						<img data-src="holder.js/100%x120/white">
-					</div>
-					<div class="chart-notes">Notes about this chart</div>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-4">
-				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
-					<div class="chart-stage">
-						<img data-src="holder.js/100%x120/white">
-					</div>
-					<div class="chart-notes">Notes about this chart</div>
-				</div>
-			</div>
-		</div>
-		
-				
 	</div>
 	<div class="container-fluid">
 		<p class="small text-muted">
@@ -332,186 +531,682 @@
 
 	<!-- script -->
 	<script type="text/javascript">
-	//data 재정의
+	//data 
 	var data = {};
 	var dataByMachine = {};
 	var dataByOrder = {};
 	var dataByItem = {};
-
+	var colorArray = [];
+	var colorMap = new Map();
+	
 	var jsonData = {};
 	var resultList = [];
 	var columnName = [];
 	
-	var makeDataByCondition = function() {		
-		var resultList = jsonData.resultList;
+	var machineList = [];
+	var orderList = [];
+	var itemList = [];
+	var precessList = []; 
+	
+	var compareDataChecked = [null, null, null, null, null, null, null, null, null];
+	
+	var initialBtnGroup = function() {
+		var inputs = $('.btn-group').find("input[name='btnForCompare']:checked");
+
+		var buttons = $('.btn-group').find("input[name='btnForCompare']");
+		for(var i = 0; i < buttons.length; i++) {
+			$($(buttons[i]).parent()).attr("disabled", false);
+		}
 		
-		resultList.forEach(function(each) {
-			var eachData = {};
-			var eachArray = [];
+		for(var i = 0; i < inputs.length; i++) {
+			$(inputs[i]).prop("checked", false);
+			$($(inputs[i]).parent()).removeClass("active");
+		}
 
-			//data
-			eachData = {};
-			eachArray = [];
-			eachData.itemName = each["품목명"];
-			eachData.processNum = each["공정번호"];
-			eachData.machine = each["배정기계"];
-			eachData.startTime = each["시작시간"];
-			eachData.endTime = each["종료시간"];
-			eachData.processTime = each["공정시간"];
-			eachData.resettingTime = each["재셋팅시간"];
-			eachData.order = each["주문자"];
-			eachData.count = each["주문수량"];
-			
-			data[each["주문번호"]] = eachData;
-			if(!data.hasOwnProperty("numberList")) {
-				data.numberList = eachArray;
-			}
-			data.numberList.push(each["주문번호"]);				
-			
-			//dataByMachine
-			eachData = {};
-			eachArray = [];
-			eachData.itemName = each["품목명"];
-			eachData.processNum = each["공정번호"];
-			eachData.number = each["주문번호"];
-			eachData.startTime = each["시작시간"];
-			eachData.endTime = each["종료시간"];
-			eachData.processTime = each["공정시간"];
-			eachData.resettingTime = each["재셋팅시간"];
-			eachData.order = each["주문자"];
-			eachData.count = each["주문수량"];
-			
-			if(!dataByMachine.hasOwnProperty(each["배정기계"])){
-				dataByMachine[each["배정기계"]] = eachArray;
-			}
-			dataByMachine[each["배정기계"]].push(eachData);
+		$("#AreaChartForMachine").children("svg").remove();
+		$("#AreaChartForMachine").children("div.bb-tooltip-container").remove();
 
-			if(!dataByMachine.hasOwnProperty("machineList")) {
-				eachArray = [];
-				dataByMachine.machineList = eachArray;
-			}
-			if(-1 == dataByMachine.machineList.indexOf(each["배정기계"])) {
-				dataByMachine.machineList.push(each["배정기계"]);								
-			}
-			
-			//dataByOrder
-			eachData = {};
-			eachArray = [];
-			eachData.itemName = each["품목명"];
-			eachData.processNum = each["공정번호"];
-			eachData.number = each["주문번호"];
-			eachData.startTime = each["시작시간"];
-			eachData.endTime = each["종료시간"];
-			eachData.processTime = each["공정시간"];
-			eachData.resettingTime = each["재셋팅시간"];
-			eachData.machine = each["배정기계"];
-			eachData.count = each["주문수량"];
-			
-			if(!dataByOrder.hasOwnProperty(each["주문자"])){
-				dataByOrder[each["주문자"]] = eachArray;
-			}
-			dataByOrder[each["주문자"]].push(eachData);
-
-			if(!dataByOrder.hasOwnProperty("orderList")) {
-				eachArray = [];
-				dataByOrder.orderList = eachArray;
-			}
-			if(-1 == dataByOrder.orderList.indexOf(each["주문자"])) {
-				dataByOrder.orderList.push(each["주문자"]);				
-			}
-			
-			//dataByItem
-			eachData = {};
-			eachArray = [];
-			eachData.order = each["주문자"];
-			eachData.number = each["주문번호"];
-			eachData.startTime = each["시작시간"];
-			eachData.endTime = each["종료시간"];
-			eachData.processTime = each["공정시간"];
-			eachData.resettingTime = each["재셋팅시간"];
-			eachData.machine = each["배정기계"];
-			eachData.count = each["주문수량"];
-
-			if(dataByItem.hasOwnProperty(each["품목명"])){
-				if(!dataByItem[each["품목명"]].hasOwnProperty(each["공정번호"])){
-					dataByItem[each["품목명"]][each["공정번호"]] = eachArray;
-				}	
-				dataByItem[each["품목명"]][each["공정번호"]].push(eachData);
-			}
-			else {
-				eachArray.push(eachData);
-				var tempJson = {};
-				tempJson[each["공정번호"]] = eachArray; 
-				dataByItem[each["품목명"]] = tempJson;
-			}
-
-			if(!dataByItem.hasOwnProperty("itemList")) {
-				eachArray = [];
-				dataByItem.itemList = eachArray;
-			}
-			if(-1 == dataByItem.itemList.indexOf(each["품목명"])) {
-				dataByItem.itemList.push(each["품목명"]);				
-			}
-			
-			if(!dataByItem[each["품목명"]].hasOwnProperty("processNumList")) {
-				eachArray = [];
-				dataByItem[each["품목명"]].processNumList = eachArray; 
-			}
-			if(-1 == dataByItem[each["품목명"]].processNumList.indexOf(each["공정번호"])) {
-				dataByItem[each["품목명"]].processNumList.push(each["공정번호"]);
-			}
-		});
+		$("#AreaChartForOrder").children("svg").remove();
+		$("#AreaChartForOrder").children("div.bb-tooltip-container").remove();
 		
-		//sort
-		data.numberList.sort();
-		dataByMachine.machineList.sort();
-		dataByOrder.orderList.sort();
-		dataByItem.itemList.sort();
+		$("#BarChartForItem").children("svg").remove();
+		$("#BarChartForItem").children("div.bb-tooltip-container").remove();
 		
-		console.log(data);
-		console.log(dataByMachine);
-		console.log(dataByOrder);
-		console.log(dataByItem);
-	}
-			
-	var callToolTip = function(itemName, processNum, machineNum, startTime, endTime, processTime, resettingTime, order, count) {
-		//dayWorkTableToolTip
-		alert("dd");
+		$("div.btn-group-group").removeClass("hidden");
 	}
 	
-	var createDayWorkTable = function() {
-		workArray = [];
-		var gs = $("#XAxisTickPosition").children("svg").children("g");
+	
+	var getCurState = function(key1, key2) {
+		var curState = "";
+
+		if(key1 == "psopre") {
+			curState = "기존 PSO ";
+		}
+		else if(key1 == "pso") {
+			curState = "PSO ";
+		}
+		else {
+			curState = "Greedy ";
+		}
+
+		curState += key2.split("")[0].toUpperCase() + key2.substring(1, key2.length);
 		
-		var gLast = $(gs[1]).children("g");
-		var lines = gLast.find("line");
+		return curState;
+	}
+	
+	var makeGraphForItem = function(key1, key2) {
+		//BarChartForItem
+		var columnsData = [];
+
+ 		var x = ["x"];
+		for(var j = 0; j < itemList.length; j++) {
+			x.push(itemList[j]);
+		}		
+		columnsData.push(x);
+
+		console.log(dataByItem);
+		for(var i = 0; i < key1.length; i++) {
+			var processNumMax = 0;
+			dataByItem[key1[i]][key2[i]].itemList.forEach(function(item) {
+				if(processNumMax < dataByItem[key1[i]][key2[i]][item].processNumList.length) {
+					processNumMax = dataByItem[key1[i]][key2[i]][item].processNumList.length;
+				}
+			});
+			
+			for(var j = 0; j < processNumMax; j++) {
+				var column = [];
+				column.push(getCurState(key1[i], key2[i]) + " " + (j + 1) + "번 공정");
+
+				for(var k = 0; k < itemList.length; k++) {
+					var totalTime = 0;
+					if(dataByItem[key1[i]][key2[i]].hasOwnProperty(itemList[k])) {
+						if(dataByItem[key1[i]][key2[i]][itemList[k]].hasOwnProperty(j + 1)) {
+							dataByItem[key1[i]][key2[i]][itemList[k]][j + 1].forEach(function(work) {
+								totalTime += parseInt(work.processTime) + parseInt(work.resettingTime);
+							});
+						}						
+					}
+					if(totalTime == 0) {
+						column.push(null);
+					}
+					else {
+						column.push(totalTime);						
+					}
+				}		
+				
+				columnsData.push(column);
+			}
+		}
+		
+		
+		console.log(columnsData);
+		
+		var chart = bb.generate({
+			  data: {
+				x: "x",
+			    columns: columnsData,
+			    type: "bar",
+			    labels: true
+			  },
+			  axis: {
+				  x: {
+					  type: "category"
+				  }
+			  },
+			  zoom: {
+				enabled: true,
+				rescale: true
+			  },
+			  bar: {
+				padding: 3  
+			  },
+			  bindto: "#BarChartForItem"
+			});
+	}
+	
+	var makeGraphForOrder = function(key1, key2) {
+		//AreaChartForOrder		
+		var columnsData = [];
+		var typeData = {};
+		
+		var x = ["x"];
+		for(var j = 0; j < orderList.length; j++) {
+			x.push(orderList[j]);
+		}		
+		columnsData.push(x);
+
+		
+		for(var i = 0; i < key1.length; i++) {
+
+			if(i % 2 == 0) {
+				typeData[getCurState(key1[i], key2[i])] = "area";
+			}
+			else {
+				typeData[getCurState(key1[i], key2[i])] = "area-spline";				
+			}
+
+			var column = [];
+			column.push(getCurState(key1[i], key2[i]));
+
+			console.log();
+			for(var j = 0; j < orderList.length; j++) {
+				var totalTime = 0;
+				if(dataByOrder[key1[i]][key2[i]].hasOwnProperty(orderList[j])) {
+					dataByOrder[key1[i]][key2[i]][orderList[j]].forEach(function(work) {
+						totalTime += parseInt(work.processTime) + parseInt(work.resettingTime);
+					});
+				}		
+				column.push(totalTime);
+			}
+			
+			columnsData.push(column);
+		}
+				
+		var chart = bb.generate({
+			  data: {
+				x: "x",
+			    columns: columnsData,
+			    types: typeData
+			  },
+			  axis: {
+				  x: {
+					  type: "category"
+				  }
+			  },
+			  zoom: {
+				enabled: true,
+				rescale: true
+			  },
+			  bindto: "#AreaChartForOrder"
+			});
+	}
+	
+	var makeGraphForMachine = function(key1, key2) {
+		//AreaChartForMachine		
+		var columnsData = [];
+		var typeData = {};
+		
+		var x = ["x"];
+		for(var j = 0; j < machineList.length; j++) {
+			x.push(machineList[j]);
+		}		
+		columnsData.push(x);
+		
+		for(var i = 0; i < key1.length; i++) {
+
+			if(i % 2 == 0) {
+				typeData[getCurState(key1[i], key2[i])] = "area";
+			}
+			else {
+				typeData[getCurState(key1[i], key2[i])] = "area-spline";				
+			}
+
+			var column = [];
+			column.push(getCurState(key1[i], key2[i]));
+
+			for(var j = 0; j < machineList.length; j++) {
+				var totalTime = 0;
+				if(dataByMachine[key1[i]][key2[i]].hasOwnProperty(machineList[j])) {
+					dataByMachine[key1[i]][key2[i]][machineList[j]].forEach(function(work) {
+						totalTime += parseInt(work.processTime) + parseInt(work.resettingTime);
+					});
+				}		
+				column.push(totalTime);
+			}
+			columnsData.push(column);
+		}
+		
+		var chart = bb.generate({
+			  data: {
+				x: "x",
+			    columns: columnsData,
+			    types: typeData
+			  },
+			  zoom: {
+				enabled: true,
+				rescale: true
+			  },
+			  bindto: "#AreaChartForMachine"
+			});
+		
+	}
+	var makeGraph = function() {
+		var key1 = [];
+		var key2 = [];
+		compareDataChecked.forEach(function(checked) {
+			if(checked != null) {
+				key1.push(checked.key1);
+				key2.push(checked.key2);
+			}
+		});		
+		
+		makeGraphForMachine(key1, key2); 
+		makeGraphForOrder(key1, key2);
+		makeGraphForItem(key1, key2);
+		
+		
+	}
+	
+	var setCompareDate = function(key1, key2, checked, index) {
+		if(compareDataChecked[index] == null) {
+			var tempJson = {};
+			tempJson.key1 = key1;
+			tempJson.key2 = key2;
+			
+			compareDataChecked[index] = tempJson;
+		}
+		else {
+			compareDataChecked[index] = null;
+		}
+		makeGraph();			
+	}
+	
+	var callToolTip = function(key1, key2, machineNum, gridsNum) {
+		//투명도 조절
+		var tr = $("#hourHead").find("tr.grids");
+		for(var i = 0; i < tr.length; i++) {
+			if(machineNum == $(tr[i]).find("th.machine").text()) {
+				var eachTd = $(tr[i]).find("td.work"); 
+				for(var j = 0; j < eachTd.length; j++){
+					$(eachTd[j]).css({
+							'opacity': '0.3'
+					});
+				}
+				break;
+			}
+		}
+		
+		//tooltip
+		var tooltip = $(".modal.workInfo").find("tbody");
+
+		tooltip.children(".toolTipNumber").find("th.toolTipName").remove();
+		tooltip.children(".toolTipItemName").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipProcessNum").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipMachine").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipStartTime").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipEndTime").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipProcessTime").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipResettingTime").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipOrder").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipCount").find("td.toolTipValue").remove();
+		tooltip.children(".toolTipOrderNum").find("td.toolTipValue").remove();
+		
+		$(".modal.workInfo").modal({backdrop: 'static', keyboard: false});
+
+		
+		var th = $(tr[i]).find("th.machine");
+
+		//37
+		var top = $("#containerChart")[0].offsetTop + 38 + 5 + 77 + (37 * gridsNum);
+		var left = 25 - $("#toolTipDialog")[0].offsetLeft; 
+		if($("#toolTipDialog").css('left') >= '0px') {
+			$("#toolTipDialog").css({
+				'left': left + 'px'
+			});
+		}
+	
+		var workTr = $($("#hourHead").find("tr.grids")[gridsNum]).find("th.machine");
+		$("#toolTipDialog").css({
+			'top': top + "px"
+		});
+	
+		$(".modal.workInfo").find(".toolTipTitle").text("기계번호: " + machineNum);
+		
+		for(var i = 0; i < dataByMachine[key1][key2][machineNum].length; i++) {
+			var thNumber = $("<th/>", {
+				text: dataByMachine[key1][key2][machineNum][i].number,
+				class: "name"
+			});
+			thNumber.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdItemName = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].itemName
+			});
+			tdItemName.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdProcessNum = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].processNum
+			});
+			tdProcessNum.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdMachine = $("<td/>", {
+				class: "value",
+				text: machineNum
+			});
+			tdMachine.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdStartTime = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].startTime
+			});
+			tdStartTime.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdEndTime = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].endTime
+			});
+			tdEndTime.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdProcessTime = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].processTime
+			});
+			tdProcessTime.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdResettingTime = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].resettingTime
+			});
+			tdResettingTime.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdOrder = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].order
+			});
+			tdOrder.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdCount = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].count
+			});
+			tdCount.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			var tdOrderNum = $("<td/>", {
+				class: "value",
+				text: dataByMachine[key1][key2][machineNum][i].orderNum
+			});
+			tdOrderNum.css({
+				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
+			});
+			
+			tooltip.children(".toolTipNumber").append(thNumber);
+			tooltip.children(".toolTipItemName").append(tdItemName);
+			tooltip.children(".toolTipProcessNum").append(tdProcessNum);
+			tooltip.children(".toolTipMachine").append(tdMachine);
+			tooltip.children(".toolTipStartTime").append(tdStartTime);
+			tooltip.children(".toolTipEndTime").append(tdEndTime);
+			tooltip.children(".toolTipProcessTime").append(tdProcessTime);
+			tooltip.children(".toolTipResettingTime").append(tdResettingTime);
+			tooltip.children(".toolTipOrder").append(tdOrder);
+			tooltip.children(".toolTipCount").append(tdCount);
+			tooltip.children(".toolTipOrderNum").append(tdOrderNum);
+			
+		}
+	}
+	var compareInt = function(a, b) {
+		return parseInt(a) - parseInt(b);
+	}
+	
+	var makeDataByCondition = function() {		
+		//초기화
+		data = {};
+		dataByMachine = {};
+		dataByOrder = {};
+		dataByItem = {};
+
+		machineList = [];
+		orderList = [];
+		compareDataChecked = [null, null, null, null, null, null, null, null, null];
+		
+		var keyArray1 = [];
+		keyArray1.push("greedy");
+		keyArray1.push("pso");
+		keyArray1.push("psopre");
+
+		var keyArray2 = [];
+		keyArray2.push("deadline");
+		keyArray2.push("priority");
+		keyArray2.push("combination");
+		
+		//color Map
+		colorMap = new Map();
+		var colorIndex = 0;
+		
+		//machineList
+		var machineMap = new Map();
+		//orderList
+		var orderMap = new Map();
+		//itemList
+		var itemMap = new Map();
+		//processList
+		var processMap = new Map();
+		
+		keyArray1.forEach(function(key1) {
+			data[key1] = {};
+			dataByMachine[key1] = {};
+			dataByOrder[key1] = {};
+			dataByItem[key1] = {};
+			
+		    keyArray2.forEach(function(key2) {
+		    	var resultList = jsonData[key1][key2].resultList;
+		    	var eachData = {};
+		    	var eachDataByMachine = {};
+		    	var eachDataByOrder = {};
+		    	var eachDataByItem = {};
+		        	    	
+		    	resultList.forEach(function(each) {
+		    	    var eachJson = {};
+		    	    var eachArray = [];
+					
+		    	    //data
+		    	    eachJson = {};
+		    	    eachArray = [];
+		    	    eachJson.itemName = each["품목명"];
+		    	    eachJson.processNum = each["공정번호"];
+		    	    eachJson.machine = each["배정기계"];
+		    	    eachJson.startTime = each["시작시간"];
+		    	    eachJson.endTime = each["종료시간"];
+		    	    eachJson.processTime = each["공정시간"];
+		    	    eachJson.resettingTime = each["재셋팅시간"];
+		    	    eachJson.order = each["주문자"];
+		    	    eachJson.count = each["주문수량"];
+		    	    eachJson.orderNum = each["주문번호"];
+		    	    
+		    	    eachData[each["작업번호"]] = eachJson;
+		    	    if(!eachData.hasOwnProperty("numberList")) {
+		    	        eachData.numberList = eachArray;
+		    	    }
+		    	    eachData.numberList.push(each["작업번호"]);				
+		    	    
+		    	    //eachDataByMachine
+		    	    eachJson = {};
+		    	    eachArray = [];
+		    	    eachJson.itemName = each["품목명"];
+		    	    eachJson.processNum = each["공정번호"];
+		    	    eachJson.number = each["작업번호"];
+		    	    eachJson.startTime = each["시작시간"];
+		    	    eachJson.endTime = each["종료시간"];
+		    	    eachJson.processTime = each["공정시간"];
+		    	    eachJson.resettingTime = each["재셋팅시간"];
+		    	    eachJson.order = each["주문자"];
+		    	    eachJson.count = each["주문수량"];
+		    	    eachJson.orderNum = each["주문번호"];
+		    	    
+		    	    if(!eachDataByMachine.hasOwnProperty(each["배정기계"])){
+		    	        eachDataByMachine[each["배정기계"]] = eachArray;
+		    	    }
+		    	    eachDataByMachine[each["배정기계"]].push(eachJson);
+
+		    	    if(!eachDataByMachine.hasOwnProperty("machineList")) {
+		    	        eachArray = [];
+		    	        eachDataByMachine.machineList = eachArray;
+		    	    }
+		    	    if(-1 == eachDataByMachine.machineList.indexOf(each["배정기계"])) {
+		    	        eachDataByMachine.machineList.push(each["배정기계"]);								
+		    	    }
+		    	    if(!machineMap.has(each["배정기계"])) {
+		    	    	machineMap.set(each["배정기계"], true);
+		    	    }
+		    	    
+		    	    //eachDataByOrder
+		    	    eachJson = {};
+		    	    eachArray = [];
+		    	    eachJson.itemName = each["품목명"];
+		    	    eachJson.processNum = each["공정번호"];
+		    	    eachJson.number = each["작업번호"];
+		    	    eachJson.startTime = each["시작시간"];
+		    	    eachJson.endTime = each["종료시간"];
+		    	    eachJson.processTime = each["공정시간"];
+		    	    eachJson.resettingTime = each["재셋팅시간"];
+		    	    eachJson.machine = each["배정기계"];
+		    	    eachJson.count = each["주문수량"];
+		    	    eachJson.orderNum = each["주문번호"];
+		    	    
+		    	    if(!eachDataByOrder.hasOwnProperty(each["주문자"])){
+		    	        eachDataByOrder[each["주문자"]] = eachArray;
+		    	    }
+		    	    eachDataByOrder[each["주문자"]].push(eachJson);
+
+		    	    if(!eachDataByOrder.hasOwnProperty("orderList")) {
+		    	        eachArray = [];
+		    	        eachDataByOrder.orderList = eachArray;
+		    	    }
+		    	    if(-1 == eachDataByOrder.orderList.indexOf(each["주문자"])) {
+		    	        eachDataByOrder.orderList.push(each["주문자"]);				
+		    	    }
+		    	    if(!orderMap.has(each["주문자"])) {
+		    	    	orderMap.set(each["주문자"], true);
+		    	    }
+		    	    
+		    	    //eachDataByItem
+		    	    eachJson = {};
+		    	    eachArray = [];
+		    	    eachJson.order = each["주문자"];
+		    	    eachJson.number = each["작업번호"];
+		    	    eachJson.startTime = each["시작시간"];
+		    	    eachJson.endTime = each["종료시간"];
+		    	    eachJson.processTime = each["공정시간"];
+		    	    eachJson.resettingTime = each["재셋팅시간"];
+		    	    eachJson.machine = each["배정기계"];
+		    	    eachJson.count = each["주문수량"];
+		    	    eachJson.orderNum = each["주문번호"];
+
+		    	    if(eachDataByItem.hasOwnProperty(each["품목명"])){
+		    	        if(!eachDataByItem[each["품목명"]].hasOwnProperty(each["공정번호"])){
+		    	            eachDataByItem[each["품목명"]][each["공정번호"]] = eachArray;
+		    	        }	
+		    	        eachDataByItem[each["품목명"]][each["공정번호"]].push(eachJson);
+		    	    }
+		    	    else {
+		    	        eachArray.push(eachJson);
+		    	        var tempJson = {};
+		    	        tempJson[each["공정번호"]] = eachArray; 
+		    	        eachDataByItem[each["품목명"]] = tempJson;
+		    	    }
+
+		    	    if(!eachDataByItem.hasOwnProperty("itemList")) {
+		    	        eachArray = [];
+		    	        eachDataByItem.itemList = eachArray;
+		    	    }
+		    	    if(-1 == eachDataByItem.itemList.indexOf(each["품목명"])) {
+		    	        eachDataByItem.itemList.push(each["품목명"]);				
+		    	    }
+		    	    
+		    	    if(!eachDataByItem[each["품목명"]].hasOwnProperty("processNumList")) {
+		    	        eachArray = [];
+		    	        eachDataByItem[each["품목명"]].processNumList = eachArray; 
+		    	    }
+		    	    if(-1 == eachDataByItem[each["품목명"]].processNumList.indexOf(each["공정번호"])) {
+		    	        eachDataByItem[each["품목명"]].processNumList.push(each["공정번호"]);
+		    	    }
+		    	    
+		    	    if(!colorMap.has(each["주문번호"])) {
+		    	    	colorMap.set(each["주문번호"], colorArray[colorIndex]);
+			    	    colorIndex++;
+		    	    }
+		    	    if(colorIndex == colorArray.length) {
+		    	    	colorIndex = 0;
+		    	    }
+		    	    if(!itemMap.has(each["품목명"])) {
+		    	    	itemMap.set(each["품목명"], true);
+		    	    }
+		    	    if(!processMap.has(each["공정번호"])) {
+		    	    	processMap.set(each["공정번호"], true);
+		    	    }
+		    	});
+		        
+		    	//sort
+		    	eachData.numberList.sort(compareInt);
+		    	eachDataByMachine.machineList.sort(compareInt);
+		    	eachDataByOrder.orderList.sort();
+		    	eachDataByItem.itemList.sort();
+		    	
+		    	data[key1][key2] = eachData;
+		    	dataByMachine[key1][key2] = eachDataByMachine;
+		    	dataByOrder[key1][key2] = eachDataByOrder;
+		    	dataByItem[key1][key2] = eachDataByItem;
+		    });
+		});
+		
+		var iterator1 = machineMap[Symbol.iterator]();
+		var iterator2 = orderMap[Symbol.iterator]();
+		var iterator3 = itemMap[Symbol.iterator]();
+		var iterator4 = processMap[Symbol.iterator]();
+		
+		for (var item of iterator1) {
+			machineList.push(item[0]);
+		}
+		for (var item of iterator2) {
+			orderList.push(item[0]);
+		}
+		for (var item of iterator3) {
+			itemList.push(item[0]);
+		}
+		for (var item of iterator4) {
+			precessList.push(item[0]);
+		}
+	}
+			
+	var createDayWorkTable = function(str) {
+		var key1 = str.split("_")[0];
+		var key2 = str.split("_")[1];
+		
+		$("#dayWorkTableCurState").text(getCurState(key1, key2));
+				
+		//remove
+		$("#hourHead").children("tbody").find("tr.grids").remove();
+		
+		var workArray = [];
 		
 		//work 생성
-		for(var i = 0; i < lines.length; i++) {
+		data[key1][key2].numberList.forEach(function(number) {
 			var work = {};
 
-			work.text = i+1;
-			work.color = $(lines[i]).css("stroke");
-			work.machineNum = data[i+1].machine;
-			work.time = data[i+1].processTime; 
-
+			work.text = number;
+			work.color = colorMap.get(data[key1][key2][number].orderNum);
+			work.machineNum = data[key1][key2][number].machine;
+			work.time = parseInt(data[key1][key2][number].processTime) + parseInt(data[key1][key2][number].resettingTime); 
+			work.number = number;
+			
 			workArray.push(work);
-		}
+		});
 		//기계별로 작업 분배
 		var workMahcineArray = [];
-		for(var i = 0;  i < dataByMachine.machineList.length; i++) {
+		for(var i = 0;  i < dataByMachine[key1][key2].machineList.length; i++) {
 			var temp = [];
 			workMahcineArray.push(temp);
 		}
 
 		workArray.forEach(function(work) {
-			workMahcineArray[dataByMachine.machineList.indexOf(work.machineNum)].push(work);
+			workMahcineArray[dataByMachine[key1][key2].machineList.indexOf(work.machineNum)].push(work);
 		});
 
 		var curTime = 0;
 		
 		//1110 => 11시 10분
-		for(var i = 0; i < dataByMachine.machineList.length; i++) {
+		for(var i = 0; i < dataByMachine[key1][key2].machineList.length; i++) {
 			var tbody = $("#hourHead").children("tbody");
 			
 			var grids = $("<tr/>", {
@@ -519,8 +1214,9 @@
 			});
 			var th = $("<th/>", {
 				class: "machine",
-				text: dataByMachine.machineList[i],
-				colspan: 6
+				text: dataByMachine[key1][key2].machineList[i],
+				colspan: 6,
+				onmouseenter: "callToolTip('" + key1 + "', '" + key2 + "', " + dataByMachine[key1][key2].machineList[i] +"," + i + ")"
 			});
 			grids.append(th);
 			
@@ -531,8 +1227,7 @@
 				var tdWork = $("<td/>", {
 					class: "work",
 					text: work.text,
-					colspan: timeTenMinutes,
-					onmouseenter: "callToolTip()"
+					colspan: timeTenMinutes
 				});
 				tdWork.css({
 					'background-color': work.color
@@ -541,7 +1236,6 @@
 				
 				totalWorkTime += timeTenMinutes;
 			});
-			console.log(totalWorkTime);
 			
 			for(var j = 1; j <= ((24 * 6) - totalWorkTime) % 6; j++) {
 				var td = $("<td/>", {
@@ -549,9 +1243,8 @@
 				});
 				grids.append(td);				
 			}
-			console.log(((24 * 6) - totalWorkTime) / 6);
+			
 			for(var j = 1; j <= ((24 * 6) - totalWorkTime) / 6; j++) {
-				console.log(j);
 				var td = $("<td/>", {
 					class: "last",
 					colspan: 6
@@ -579,82 +1272,9 @@
 	var makeDayWorkTable = function() {
 		destroyDayWorkTable();
 		//grid
-		createDayWorkTable();
+		createDayWorkTable('greedy_deadline');
 		
-		
-		$("#dayWorkTableHead").removeClass("hidden");
-	}
-	
-	
-	// chart start
-	var makeDayWorkChart = function() {
-		//필요한 data 새로 만들기
-		var dayWorkData = [];
-		var machineArray = [];
-		var dayWorkData = [];
-		var group = [];
-		
-		//machine array
-		var machineArrayMap = new Map();
-		//group array
-		
-		resultList.forEach(function(json) {
-			if(!machineArrayMap.has(json[columnName[2]])) {
-				machineArrayMap.set(json[columnName[2]], true);
-				machineArray.push(json[columnName[2]]);
-			}
-			
-			group.push(json[columnName[0]] + json[columnName[1]]);
-			
-		});
-		machineArray.sort();
-		machineArray.unshift('x');
-		
-		dayWorkData.push(machineArray);
-		resultList.forEach(function(json) {
-			var tempArray = [];
-			tempArray.push(json[columnName[0]] + json[columnName[1]]);
-			machineArray.forEach(function(machine) {
-				if(machine == 'x') {
-					
-				}
-				else if(machine == json[columnName[2]]) {
-					tempArray.push(parseInt(json[columnName[5]]) + parseInt(json[columnName[6]]));
-				}
-				else {
-					tempArray.push(null);
-				}
-			});
-			dayWorkData.push(tempArray);
-		});
-		
-		var chart = bb.generate({
-			  data: {
-			    x: "x",
-			    columns: dayWorkData,
-			    type: "bar",
-			    groups: [
-			      group
-			    ]
-			  },
-			  axis: {
-				  rotated: true,
-			    x: {
-			      type: "category",
-			      clipPath: false,
-			      inner: false
-			    },
-			    y: {
-			      show: true,
-			    }
-			  },
-			  grid: {
-				y: {
-					show: true
-				}  
-			  },
-			  bindto: "#XAxisTickPosition"
-			});
+		$("#dayWorkTableDiv").removeClass("hidden");
 	}
 	
 	var visualize = function() {
@@ -664,10 +1284,10 @@
 		makeDataByCondition();
 		
 		//시각화 차트들 다 갱신
- 		makeDayWorkChart();
 		makeDayWorkTable();
- 		
 		
+		//비교 차트 버튼 
+		initialBtnGroup();
 	}
 	// chart end
 		
@@ -675,11 +1295,28 @@
 		$(".modal.addHistory").modal({backdrop: 'static', keyboard: false});
 	}
 	var closeAddHistory = function() {
-		$("#work").find("thead").remove();
-		$("#work").find("tbody").remove();
-		$("#workDiv").removeClass("hidden");
+		$("#greedy_deadline").find("thead").remove();
+		$("#greedy_deadline").find("tbody").remove();
+		$("#greedy_priority").find("thead").remove();
+		$("#greedy_priority").find("tbody").remove();
+		$("#greedy_combination").find("thead").remove();
+		$("#greedy_combination").find("tbody").remove();
+		$("#pso_deadline").find("thead").remove();
+		$("#pso_deadline").find("tbody").remove();
+		$("#pso_priority").find("thead").remove();
+		$("#pso_priority").find("tbody").remove();
+		$("#pso_combination").find("thead").remove();
+		$("#pso_combination").find("tbody").remove();
+		$("#psopre_deadline").find("thead").remove();
+		$("#psopre_deadline").find("tbody").remove();
+		$("#psopre_priority").find("thead").remove();
+		$("#psopre_priority").find("tbody").remove();
+		$("#psopre_combination").find("thead").remove();
+		$("#psopre_combination").find("tbody").remove();
+		
+		$("#workDiv").addClass("hidden");
 
-		$(".modal.addHistory").modal('toggle');
+		$(".modal.addHistory").modal('hide');
 	}
 	var selectHistory = function() {
 		$(".modal.history").modal({backdrop: 'static', keyboard: false});
@@ -688,15 +1325,44 @@
 		$("#visualizeBtn").addClass("hidden");
 		$("#historyListDiv").addClass('hidden');
  		$("#historyList").find("tbody").remove();
- 		$("#history").find("thead").remove();
-		$("#history").find("tbody").remove();
+ 		$("#historyDiv").addClass("hidden");		
 		
+		var tableArray = [];
+		tableArray.push("history_greedy_deadline");
+		tableArray.push("history_greedy_priority");
+		tableArray.push("history_greedy_combination");
+		tableArray.push("history_pso_deadline");
+		tableArray.push("history_pso_priority");
+		tableArray.push("history_pso_combination");
+		tableArray.push("history_psopre_deadline");
+		tableArray.push("history_psopre_priority");
+		tableArray.push("history_psopre_combination");
 		
-		$(".modal.history").modal('toggle');
+		for(var tableIndex = 0; tableIndex < tableArray.length; tableIndex++) {
+			$("#" + tableArray[tableIndex]).find("thead").remove();			
+			$("#" + tableArray[tableIndex]).find("tbody").remove();			
+		}
+
+		$(".modal.history").modal('hide');
 	}
 	var callHistory = function(fileName) {
-		$("#history").find("thead").remove();
-		$("#history").find("tbody").remove();
+		$("#historyDiv").addClass("hidden");
+		
+		var tableArray = [];
+		tableArray.push("history_greedy_deadline");
+		tableArray.push("history_greedy_priority");
+		tableArray.push("history_greedy_combination");
+		tableArray.push("history_pso_deadline");
+		tableArray.push("history_pso_priority");
+		tableArray.push("history_pso_combination");
+		tableArray.push("history_psopre_deadline");
+		tableArray.push("history_psopre_priority");
+		tableArray.push("history_psopre_combination");
+		
+		for(var tableIndex = 0; tableIndex < tableArray.length; tableIndex++) {
+			$("#" + tableArray[tableIndex]).find("thead").remove();			
+			$("#" + tableArray[tableIndex]).find("tbody").remove();			
+		}
 		
 		$.ajax({
 			url: "/callHistory",
@@ -705,39 +1371,53 @@
 			data: {fileName: fileName},
 			complete: function(response) {
 				jsonData = response.responseJSON;
-				resultList = response.responseJSON.resultList;
-				columnName = response.responseJSON.columnName;
 				
+				var keyArray1 = [];
+				keyArray1.push("greedy");
+				keyArray1.push("pso");
+				keyArray1.push("psopre");
 				
-				var thead = $("<thead/>");
-				var theadTr = $("<tr/>");
+				var keyArray2 = [];
+				keyArray2.push("deadline");
+				keyArray2.push("priority");
+				keyArray2.push("combination");
 				
-				columnName.forEach(function(name) {
-					var th = $("<th/>", {
-						text: name
-					});
-					theadTr.append(th);
-				});
-				thead.append(theadTr);
-				$("#history").append(thead);
+				keyArray1.forEach(function(key1) {
+					keyArray2.forEach(function(key2) {
+						var resultList = response.responseJSON[key1][key2].resultList;
+						var columnName = response.responseJSON[key1][key2].columnName;
+						
+						
+						var thead = $("<thead/>");
+						var theadTr = $("<tr/>");
+						
+						columnName.forEach(function(name) {
+							var th = $("<th/>", {
+								text: name
+							});
+							theadTr.append(th);
+						});
+						thead.append(theadTr);
+						$("#history_" + key1 + "_" + key2).append(thead);
 
-				var tbody = $("<tbody/>");
-				resultList.forEach(function(work) {
-					var tr = $("<tr/>");
-					columnName.forEach(function(name) {
-						var td = $("<td/>", {
-							text: work[name]
-						})
-						tr.append(td);
+						var tbody = $("<tbody/>");
+						resultList.forEach(function(work) {
+							var tr = $("<tr/>");
+							columnName.forEach(function(name) {
+								var td = $("<td/>", {
+									text: work[name]
+								})
+								tr.append(td);
+							});
+							tbody.append(tr);
+						});
+						$("#history_" + key1 + "_" + key2).append(tbody);
 					});
-					tbody.append(tr);
-				});
-				$("#history").append(tbody);
-				
+				}); 
+								
 				$("#historyDiv").removeClass("hidden");
 				
 				$("#visualizeBtn").removeClass("hidden");
-
 			}
 		});
 	}
@@ -763,13 +1443,27 @@
 	}
  	var showHistory = function() {
  		//table 초기화
- 		
- 		
- 		$("#historyListDiv").addClass('hidden');
+ 		$("#visualizeBtn").addClass("hidden");
+		$("#historyListDiv").addClass('hidden');
  		$("#historyList").find("tbody").remove();
- 		$("#history").find("thead").remove();
-		$("#history").find("tbody").remove();
+ 		$("#historyDiv").addClass("hidden");		
 		
+		var tableArray = [];
+		tableArray.push("history_greedy_deadline");
+		tableArray.push("history_greedy_priority");
+		tableArray.push("history_greedy_combination");
+		tableArray.push("history_pso_deadline");
+		tableArray.push("history_pso_priority");
+		tableArray.push("history_pso_combination");
+		tableArray.push("history_psopre_deadline");
+		tableArray.push("history_psopre_priority");
+		tableArray.push("history_psopre_combination");
+		
+		for(var tableIndex = 0; tableIndex < tableArray.length; tableIndex++) {
+			$("#" + tableArray[tableIndex]).find("thead").remove();			
+			$("#" + tableArray[tableIndex]).find("tbody").remove();			
+		}
+				
  		$.ajax({
 			url: "/readHistoryList",
 			type: "POST",
@@ -800,84 +1494,103 @@
 	
 	var clickFileInput = function() {
 		$('input[name="xlfile"]').click();
+		
 	}	
 
-	var fillTableWork = function(result_list) {
+	var fillTableWork = function(sheets) {
 		jsonData = {};
-		console.log(jsonData);
-		
-		var addressNum = 1;
-		var addressAlpabet = 65; // A
-		var address = String.fromCharCode(addressAlpabet) + addressNum;
-		
-		var table = $("#work");
-		
-		var thead = $("<thead/>");
-		var tr = $("<tr/>", {
-			class: "workTableHead"
-		});
-		
-		//json
-		var columnName = [];
-		var resultList = [];
-		
-		while(result_list[address] != undefined) {
-			var th = $("<th/>", {
-				text: result_list[address].w
+		jsonData.greedy = {};
+		jsonData.pso = {};
+		jsonData.psopre = {};
+
+		var sheetArray = [];
+		sheetArray.push("greedy_deadline");
+		sheetArray.push("greedy_priority");
+		sheetArray.push("greedy_combination");
+		sheetArray.push("pso_deadline");
+		sheetArray.push("pso_priority");
+		sheetArray.push("pso_combination");
+		sheetArray.push("psopre_deadline");
+		sheetArray.push("psopre_priority");
+		sheetArray.push("psopre_combination");
+
+		for(var sheetNum = 0; sheetNum < sheetArray.length; sheetNum++) {			
+			var addressNum = 1;
+			var addressAlpabet = 65; // A
+			var address = String.fromCharCode(addressAlpabet) + addressNum;
+			
+			var table = $("#" + sheetArray[sheetNum]);
+			
+			var thead = $("<thead/>");
+			var tr = $("<tr/>", {
+				class: "workTableHead"
 			});
-			tr.append(th);
 			
 			//json
-			columnName.push(result_list[address].w);
+			var columnName = [];
+			var resultList = [];
 			
-			addressAlpabet++;
-			address = String.fromCharCode(addressAlpabet) + addressNum;
-		}
-		thead.append(tr);
-		table.append(thead);
-		
-		var tbody = $("<tbody/>");
-		
-		addressNum++;
-		addressAlpabet = 65;
-		address = String.fromCharCode(addressAlpabet) + addressNum;
-		
-		while(result_list[address] != undefined) {
-			var tr = $("<tr/>");
-			
-			//json
-			var columnNum = 0;
-			var row = {};
-			
-			while(result_list[address] != undefined) {
-				var td = $("<td/>", {
-					text: result_list[address].w
+			while(sheets[sheetArray[sheetNum]][address] != undefined) {
+				var th = $("<th/>", {
+					text: sheets[sheetArray[sheetNum]][address].w
 				});
+				tr.append(th);
 				
 				//json
-				row[columnName[columnNum]] = result_list[address].w; 
-				columnNum++;
+				columnName.push(sheets[sheetArray[sheetNum]][address].w);
 				
-				tr.append(td);
 				addressAlpabet++;
 				address = String.fromCharCode(addressAlpabet) + addressNum;
-				
 			}
-			//json
-			resultList.push(row);
+			thead.append(tr);
+			table.append(thead);
 			
-			tbody.append(tr);
+			var tbody = $("<tbody/>");
 			
 			addressNum++;
 			addressAlpabet = 65;
 			address = String.fromCharCode(addressAlpabet) + addressNum;
+			
+			while(sheets[sheetArray[sheetNum]][address] != undefined) {
+				var tr = $("<tr/>");
+				
+				//json
+				var columnNum = 0;
+				var row = {};
+				
+				while(sheets[sheetArray[sheetNum]][address] != undefined) {
+					var td = $("<td/>", {
+						text: sheets[sheetArray[sheetNum]][address].w
+					});
+					
+					//json
+					row[columnName[columnNum]] = sheets[sheetArray[sheetNum]][address].w; 
+					columnNum++;
+					
+					tr.append(td);
+					addressAlpabet++;
+					address = String.fromCharCode(addressAlpabet) + addressNum;
+					
+				}
+				//json
+				resultList.push(row);
+				
+				tbody.append(tr);
+				
+				addressNum++;
+				addressAlpabet = 65;
+				address = String.fromCharCode(addressAlpabet) + addressNum;
+			}
+			
+			//json
+			var tempjson = {};
+			tempjson.resultList = resultList;
+			tempjson.columnName = columnName;
+			
+			jsonData[sheetArray[sheetNum].split("_")[0]][sheetArray[sheetNum].split("_")[1]] = tempjson;
+
+			table.append(tbody);			
 		}
-		
-		//json
-		jsonData.resultList = resultList;
-		jsonData.columnName = columnName;
-		
-		table.append(tbody);
 	}
 	
 	var X = XLSX;
@@ -968,9 +1681,8 @@
 					case 'e': console.error(e.data.d); break;
 					case XW.msg: 
 						cb(JSON.parse(e.data.d));
-						console.log(JSON.parse(e.data.d));
 						//this is data
-						fillTableWork(JSON.parse(e.data.d).Sheets.result_list);
+						fillTableWork(JSON.parse(e.data.d).Sheets);
 						
 						
 						var obj_s = JSON.stringify(JSON.parse(e.data.d), null, "\t");
@@ -1005,7 +1717,53 @@
 		};
 	})();
 	
+	
 	(function() {
+		$.ajax({
+			url: "/getColorTable",
+			type: "POST",
+			dataType: "JSON",
+			complete: function(response) {
+				colorArray = response.responseJSON.colorArray;
+			}
+		});
+		
+		
+		$('input[name="btnForCompare"]').change(function() {
+			var number = $('.btn-group').find("input[name='btnForCompare']:checked").length;
+			var inputs = $('.btn-group').find("input[name='btnForCompare']:not(:checked)");
+			if (number > 2) {
+				for(var i = 0; i < inputs.length; i++) {
+					$($(inputs[i]).parent()).attr("disabled", true);
+				}
+			}else {
+				for(var i = 0; i < inputs.length; i++) {
+					($(inputs[i]).parent()).attr("disabled", false);
+				}
+			}
+		});
+		
+		$("#toolTipContent").mouseleave(function(){
+			//투명도 조절
+			var title = $(".modal.workInfo").find("h3.toolTipTitle").text();
+			var machineNum = title.split(": ")[1]; 
+			
+			var tr = $("#hourHead").find("tr.grids");
+			for(var i = 0; i < tr.length; i++) {
+				if(machineNum == $(tr[i]).find("th.machine").text()) {
+					var eachTd = $(tr[i]).find("td.work"); 
+					for(var j = 0; j < eachTd.length; j++){
+						$(eachTd[j]).css({
+								'opacity': '1'
+						});
+					}
+					break;
+				}
+			}
+
+			$(".modal.workInfo").modal('hide');			
+		});
+		
 		var xlf = document.getElementById('xlf');
 		if(!xlf.addEventListener) return;
 		function handleFile(e) { 

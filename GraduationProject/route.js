@@ -61,7 +61,7 @@ router.post('/getResult', function(req, res) {
 	
 	var jsonData = JSON.stringify(resultList, null, 2);
 	
-	fs.writeFile(path.join(__dirname, "/py/", "input.json"), jsonData, 'utf-8', function(e){
+	fs.writeFileSync(path.join(__dirname, "/py/", "input.json"), jsonData, 'utf-8', function(e){
     if(e){
         console.log(e);
     }
@@ -70,17 +70,28 @@ router.post('/getResult', function(req, res) {
     }
     });
     
-/*    var process = spawn('python',["writejson.py"],{cwd : './py/'});
     console.log("pre");
-    process.stdout.on('data',function(chunk){
-        var textChunk = chunk.toString('utf8'); // buffer to string
-    });
+    var process = spawn('python',["writejson.py"],{cwd : path.join(__dirname, "/py/")});
 
-	console.log("end");
-*/
-    var resultJson = JSON.parse(fs.readFileSync(path.join(__dirname, "/saveresult/", "result.json"), 'utf-8'));
-    res.json(resultJson);
-    res.end();
+	process.stdout.on('data', (data) => {
+		console.log("stdouton");
+		console.log(`stdout: ${data}`);
+	});
+
+	process.stderr.on('data', (data) => {
+		console.log("stderrton");
+		console.log(`stderr: ${data}`);
+	});
+
+	process.on('close', (code) => {
+		console.log("close");
+		console.log(`child process exited with code ${code}`);
+		
+		var resultJson = JSON.parse(fs.readFileSync(path.join(__dirname, "/saveresult/", "result.json"), 'utf-8'));
+	    res.json(resultJson);
+	    res.end();
+	});
+	   
 });
 
 router.post('/readHistoryList', function(req, res) {

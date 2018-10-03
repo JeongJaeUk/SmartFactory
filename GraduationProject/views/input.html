@@ -462,6 +462,15 @@
 		var date = new Date();
 		var fileName = "inputJson";
 
+		//loading 표시
+		swal({
+			title: 'Loading...',
+			imageUrl: 'static/img/loading.gif',
+			imageSize: '400x400',
+			imageAlt: 'Custom image',
+			animation: false
+		});
+		
 		$.ajax({
 			url: "/getResult",
 			type: "POST",
@@ -472,7 +481,7 @@
 				writeJson(response);
 				writeRemain(response);
 				swal(response.success, "작업 계획이 기록되었습니다.", "success").then(function() {
-					
+					window.location.href = "./output";
 				});
 			}, error: function(reqeuse, status, error) {
 				swal(response.error, "기록에 실패하였습니다. 다시 시도해 주십시오.", "error")

@@ -123,16 +123,16 @@
 				<a class="navbar-brand" href="./output">작업 계획 확인</a>
 			</div>
 			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav navbar-left">
-					<!-- 여기에 각 그래프 목록들  -->
-					<li><a href="#">기계별 작업 계획</a></li>
+				<ul class="nav navbar-nav navbar-left hidden" id="linkNav">
+					<li><a href="#top">비교 데이터 선택 버튼</a></li>
+					<li><a href="#processNumTable">비교 그래프</a></li>
 				</ul>
 			</div>
 		</div>
 	</div>
 
 	<div class="modal workInfo">
-		<div class="modal-dialog modal-sm" style="position: absoulute;" id="toolTipDialog">
+		<div class="modal-dialog modal-lg" style="position: absoulute;" id="toolTipDialog">
 			<div class="modal-content" id="toolTipContent" style="width: 450px; ">
 				<div class="modal-header" style="height: 50px; padding-left: 15px; padding-top: 15px">
     				<div class="modal-title">
@@ -365,12 +365,47 @@
 	<ul class="selectHistoryDiv">
 		<li>
 			<button type="button" class="btn btn-primary" id="selectHistoryBtn" style="margin-bottom: 10px;" onclick="selectHistory()">작업 계획 선택</button>
+			<div class="btn-group-group hidden" id="btn-group" style="display:inline-block; margin-left: 15px;">
+				<div class="btn-group greedy" data-toggle="buttons" style="margin-bottom: 10px;">
+					<label class="btn btn-primary" onclick="setCompareDate('greedy', 'deadline', !$(this).children('input').prop('checked'), 0)">
+						<input type="checkbox" name="btnForCompare" id="btnGreedyDeadline"> Greedy Deadline
+					</label>
+					<label class="btn btn-primary" onclick="setCompareDate('greedy', 'priority', !$(this).children('input').prop('checked'), 1)">
+						<input type="checkbox" name="btnForCompare" id="btnGreedyPriority"> Greedy Priority
+					</label>
+					<label class="btn btn-primary" onclick="setCompareDate('greedy', 'combination', !$(this).children('input').prop('checked'), 2)">
+						<input type="checkbox" name="btnForCompare" id="btnGreedyCombination"> Greedy Combination
+					</label>
+				</div>
+				<div class="btn-group pso" data-toggle="buttons" style="margin-bottom: 10px;">
+					<label class="btn btn-primary" onclick="setCompareDate('pso', 'deadline', !$(this).children('input').prop('checked'), 3)">
+						<input type="checkbox" name="btnForCompare" id="btnPSODeadline"> PSO Deadline
+					</label>
+					<label class="btn btn-primary" onclick="setCompareDate('pso', 'priority', !$(this).children('input').prop('checked'), 4)">
+						<input type="checkbox" name="btnForCompare" id="btnPSOPriority"> PSO Priority
+					</label>
+					<label class="btn btn-primary" onclick="setCompareDate('pso', 'combination', !$(this).children('input').prop('checked'), 5)">
+						<input type="checkbox" name="btnForCompare" id="btnPSOCombination"> PSO Combination
+					</label>
+				</div>
+				<div class="btn-group psopre" data-toggle="buttons" style="margin-bottom: 10px;">
+					<label class="btn btn-primary" onclick="setCompareDate('psopre', 'deadline', !$(this).children('input').prop('checked'), 6)">
+						<input type="checkbox" name="btnForCompare" id="btnPSOPreDeadline"> 기존 PSO Deadline
+					</label>
+					<label class="btn btn-primary" onclick="setCompareDate('psopre', 'priority', !$(this).children('input').prop('checked'), 7)">
+						<input type="checkbox" name="btnForCompare" id="btnPSOPrePriority"> 기존 PSO Priority
+					</label>
+					<label class="btn btn-primary" onclick="setCompareDate('psopre', 'combination', !$(this).children('input').prop('checked'), 8)">
+						<input type="checkbox" name="btnForCompare" id="btnPSOPreCombination"> 기존 PSO Combination
+					</label>
+				</div>
+			</div>
 		</li>
 	</ul>
 	
 	<div class="container-fluid" id="containerChart">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-sm-12" id="dayWorkTableLink">
 				<div class="chart-wrapper">
 					<div class="chart-title">기계별 하루 작업 계획</div>
 					
@@ -453,71 +488,43 @@
 			</div>
 		</div>
 		
-		<div class="btn-group-group hidden" style="margin-top: 30px;">
-			<div class="btn-group greedy" data-toggle="buttons" style="margin-bottom: 10px;">
-				<label class="btn btn-primary" onclick="setCompareDate('greedy', 'deadline', !$(this).children('input').prop('checked'), 0)">
-					<input type="checkbox" name="btnForCompare" id="btnGreedyDeadline"> Greedy Deadline
-				</label>
-				<label class="btn btn-primary" onclick="setCompareDate('greedy', 'priority', !$(this).children('input').prop('checked'), 1)">
-					<input type="checkbox" name="btnForCompare" id="btnGreedyPriority"> Greedy Priority
-				</label>
-				<label class="btn btn-primary" onclick="setCompareDate('greedy', 'combination', !$(this).children('input').prop('checked'), 2)">
-					<input type="checkbox" name="btnForCompare" id="btnGreedyCombination"> Greedy Combination
-				</label>
-			</div>
-			<div class="btn-group pso" data-toggle="buttons" style="margin-bottom: 10px;">
-				<label class="btn btn-primary" onclick="setCompareDate('pso', 'deadline', !$(this).children('input').prop('checked'), 3)">
-					<input type="checkbox" name="btnForCompare" id="btnPSODeadline"> PSO Deadline
-				</label>
-				<label class="btn btn-primary" onclick="setCompareDate('pso', 'priority', !$(this).children('input').prop('checked'), 4)">
-					<input type="checkbox" name="btnForCompare" id="btnPSOPriority"> PSO Priority
-				</label>
-				<label class="btn btn-primary" onclick="setCompareDate('pso', 'combination', !$(this).children('input').prop('checked'), 5)">
-					<input type="checkbox" name="btnForCompare" id="btnPSOCombination"> PSO Combination
-				</label>
-			</div>
-			<div class="btn-group psopre" data-toggle="buttons" style="margin-bottom: 10px;">
-				<label class="btn btn-primary" onclick="setCompareDate('psopre', 'deadline', !$(this).children('input').prop('checked'), 6)">
-					<input type="checkbox" name="btnForCompare" id="btnPSOPreDeadline"> 기존 PSO Deadline
-				</label>
-				<label class="btn btn-primary" onclick="setCompareDate('psopre', 'priority', !$(this).children('input').prop('checked'), 7)">
-					<input type="checkbox" name="btnForCompare" id="btnPSOPrePriority"> 기존 PSO Priority
-				</label>
-				<label class="btn btn-primary" onclick="setCompareDate('psopre', 'combination', !$(this).children('input').prop('checked'), 8)">
-					<input type="checkbox" name="btnForCompare" id="btnPSOPreCombination"> 기존 PSO Combination
-				</label>
-			</div>
-		</div>
-		
 		
 		<div class="row">
 			<div class="col-sm-12 ">
 				<div class="chart-wrapper">
-					<div class="chart-title">기계별 총 작업 시간 비교 그래프</div>
+					<div class="chart-title">품목별 처리량 그래프</div>
 					<div class="chart-stage">
-						
+						<table id="processNumTable" class="hidden" style="width: 100%">
+							<thead>
+								<tr>
+									<th>품목별 공정횟수</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
 						<div id="BarChartForItem"></div>
 					</div>
-					<div class="chart-notes">각 기준에 따른 기계별 총 작업 시간 비교</div>
+					<div class="chart-notes">품목별 각 공정에 따른 처리량 그래프</div>
 				</div>
 			</div>
 			
 			<div class="col-sm-6">
 				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
+					<div class="chart-title">기계별 처리시간 그래프</div>
 					<div class="chart-stage">
 						<div id="AreaChartForMachine"></div>
 					</div>
-					<div class="chart-notes">Notes about this chart</div>
+					<div class="chart-notes">각 기계별 총 가동시간(분)</div>
 				</div>
 			</div>
 			<div class="col-sm-6">
 				<div class="chart-wrapper">
-					<div class="chart-title">Cell Title</div>
+					<div class="chart-title">주문자 별 처리 물량 그래프</div>
 					<div class="chart-stage">
 						<div id="AreaChartForOrder"></div>
 					</div>
-					<div class="chart-notes">Notes about this chart</div>
+					<div class="chart-notes">주문자 별 총 처리 물량</div>
 				</div>
 			</div>
 			
@@ -546,7 +553,7 @@
 	var machineList = [];
 	var orderList = [];
 	var itemList = [];
-	var precessList = []; 
+	var precessList = {}; 
 	
 	var compareDataChecked = [null, null, null, null, null, null, null, null, null];
 	
@@ -573,6 +580,8 @@
 		$("#BarChartForItem").children("div.bb-tooltip-container").remove();
 		
 		$("div.btn-group-group").removeClass("hidden");
+		
+		$("#processNumTable").addClass("hidden");
 	}
 	
 	
@@ -603,30 +612,64 @@
 			x.push(itemList[j]);
 		}		
 		columnsData.push(x);
-
-		console.log(dataByItem);
+		
+		//processList;
+		$("#processNumTable").removeClass("hidden");
+		var processNumTableThead = $("#processNumTable").find("thead");
+		processNumTableThead.find("th").attr("colspan", itemList.length);
+		var processNumTableTbody = $("#processNumTable").find("tbody");
+		processNumTableTbody.find("tr").remove();
+		
+		var processNumTableTr1 = $("<tr/>");
+		var processNumTableTr2 = $("<tr/>");
+		itemList.forEach(function(item) {
+			var th = $("<th/>", {
+				text: item
+			});
+			var td = $("<td/>", {
+				text: precessList[item]
+			});
+			processNumTableTr1.append(th);
+			processNumTableTr2.append(td);
+			
+		});
+		processNumTableTbody.append(processNumTableTr1);
+		processNumTableTbody.append(processNumTableTr2);
+		
 		for(var i = 0; i < key1.length; i++) {
-			var processNumMax = 0;
-			dataByItem[key1[i]][key2[i]].itemList.forEach(function(item) {
-				if(processNumMax < dataByItem[key1[i]][key2[i]][item].processNumList.length) {
-					processNumMax = dataByItem[key1[i]][key2[i]][item].processNumList.length;
+			var numMax = 0;
+			
+			itemList.forEach(function(item) {
+				if(dataByItem[key1[i]][key2[i]].hasOwnProperty(item)) {
+					var len = dataByItem[key1[i]][key2[i]][item].processNumList.length;
+					if(len > numMax) {
+						numMax = len;
+					}
 				}
 			});
-			
-			for(var j = 0; j < processNumMax; j++) {
+									
+			for(var j = 0; j < numMax; j++) {
 				var column = [];
 				column.push(getCurState(key1[i], key2[i]) + " " + (j + 1) + "번 공정");
 
 				for(var k = 0; k < itemList.length; k++) {
-					var totalTime = 0;
-					if(dataByItem[key1[i]][key2[i]].hasOwnProperty(itemList[k])) {
-						if(dataByItem[key1[i]][key2[i]][itemList[k]].hasOwnProperty(j + 1)) {
-							dataByItem[key1[i]][key2[i]][itemList[k]][j + 1].forEach(function(work) {
-								totalTime += parseInt(work.processTime) + parseInt(work.resettingTime);
-							});
-						}						
+					var totalTime = null;
+					
+					if(precessList[itemList[k]] < j + 1) {
+						totalTime = null;
 					}
-					if(totalTime == 0) {
+					else {
+						if(dataByItem[key1[i]][key2[i]].hasOwnProperty(itemList[k])) {
+							if(dataByItem[key1[i]][key2[i]][itemList[k]].hasOwnProperty(j + 1)) {
+								dataByItem[key1[i]][key2[i]][itemList[k]][j + 1].forEach(function(work) {
+									totalTime += parseInt(work.orderNum);
+								});
+							}
+						}
+					}
+					
+					
+					if(totalTime == -1) {
 						column.push(null);
 					}
 					else {
@@ -639,7 +682,6 @@
 		}
 		
 		
-		console.log(columnsData);
 		
 		var chart = bb.generate({
 			  data: {
@@ -688,12 +730,11 @@
 			var column = [];
 			column.push(getCurState(key1[i], key2[i]));
 
-			console.log();
 			for(var j = 0; j < orderList.length; j++) {
 				var totalTime = 0;
 				if(dataByOrder[key1[i]][key2[i]].hasOwnProperty(orderList[j])) {
 					dataByOrder[key1[i]][key2[i]][orderList[j]].forEach(function(work) {
-						totalTime += parseInt(work.processTime) + parseInt(work.resettingTime);
+						totalTime += parseInt(work.orderNum);
 					});
 				}		
 				column.push(totalTime);
@@ -818,18 +859,18 @@
 		
 		//tooltip
 		var tooltip = $(".modal.workInfo").find("tbody");
-
-		tooltip.children(".toolTipNumber").find("th.toolTipName").remove();
-		tooltip.children(".toolTipItemName").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipProcessNum").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipMachine").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipStartTime").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipEndTime").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipProcessTime").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipResettingTime").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipOrder").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipCount").find("td.toolTipValue").remove();
-		tooltip.children(".toolTipOrderNum").find("td.toolTipValue").remove();
+		
+		tooltip.find(".toolTipNumber").find("th.toolTipName").remove();
+		tooltip.find(".toolTipItemName").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipProcessNum").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipMachine").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipStartTime").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipEndTime").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipProcessTime").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipResettingTime").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipOrder").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipCount").find("td.toolTipValue").remove();
+		tooltip.find(".toolTipOrderNum").find("td.toolTipValue").remove();
 		
 		$(".modal.workInfo").modal({backdrop: 'static', keyboard: false});
 
@@ -855,76 +896,76 @@
 		for(var i = 0; i < dataByMachine[key1][key2][machineNum].length; i++) {
 			var thNumber = $("<th/>", {
 				text: dataByMachine[key1][key2][machineNum][i].number,
-				class: "name"
+				class: "toolTipName"
 			});
 			thNumber.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdItemName = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].itemName
 			});
 			tdItemName.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdProcessNum = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].processNum
 			});
 			tdProcessNum.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdMachine = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: machineNum
 			});
 			tdMachine.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdStartTime = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].startTime
 			});
 			tdStartTime.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdEndTime = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].endTime
 			});
 			tdEndTime.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdProcessTime = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].processTime
 			});
 			tdProcessTime.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdResettingTime = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].resettingTime
 			});
 			tdResettingTime.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdOrder = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].order
 			});
 			tdOrder.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdCount = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].count
 			});
 			tdCount.css({
 				'background-color': colorMap.get(dataByMachine[key1][key2][machineNum][i].orderNum)
 			});
 			var tdOrderNum = $("<td/>", {
-				class: "value",
+				class: "toolTipValue",
 				text: dataByMachine[key1][key2][machineNum][i].orderNum
 			});
 			tdOrderNum.css({
@@ -1132,8 +1173,13 @@
 		    	    if(!itemMap.has(each["품목명"])) {
 		    	    	itemMap.set(each["품목명"], true);
 		    	    }
-		    	    if(!processMap.has(each["공정번호"])) {
-		    	    	processMap.set(each["공정번호"], true);
+		    	    if(!processMap.has(each["품목명"])) {
+		    	    	processMap.set(each["품목명"], parseInt(each["공정번호"]));
+		    	    }
+		    	    else {
+						if(processMap.get(each["품목명"]) < parseInt(each["공정번호"])) {
+							processMap.set(each["품목명"], parseInt(each["공정번호"]));
+						}    	    	
 		    	    }
 		    	});
 		        
@@ -1147,6 +1193,8 @@
 		    	dataByMachine[key1][key2] = eachDataByMachine;
 		    	dataByOrder[key1][key2] = eachDataByOrder;
 		    	dataByItem[key1][key2] = eachDataByItem;
+		    	
+		    	
 		    });
 		});
 		
@@ -1156,7 +1204,7 @@
 		var iterator4 = processMap[Symbol.iterator]();
 		
 		for (var item of iterator1) {
-			machineList.push(item[0]);
+			machineList.push(parseInt(item[0]));
 		}
 		for (var item of iterator2) {
 			orderList.push(item[0]);
@@ -1165,8 +1213,12 @@
 			itemList.push(item[0]);
 		}
 		for (var item of iterator4) {
-			precessList.push(item[0]);
+			precessList[item[0]] = item[1];
 		}
+		machineList.sort(compareInt);
+		orderList.sort();
+		itemList.sort();
+		
 	}
 			
 	var createDayWorkTable = function(str) {
@@ -1288,6 +1340,9 @@
 		
 		//비교 차트 버튼 
 		initialBtnGroup();
+		
+		//link 
+		$("#linkNav").removeClass("hidden");
 	}
 	// chart end
 		
@@ -1727,7 +1782,6 @@
 				colorArray = response.responseJSON.colorArray;
 			}
 		});
-		
 		
 		$('input[name="btnForCompare"]').change(function() {
 			var number = $('.btn-group').find("input[name='btnForCompare']:checked").length;

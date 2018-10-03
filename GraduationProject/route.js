@@ -20,6 +20,14 @@ router.get('/about', function(req, res) {
 	res.sendFile(path.join(__dirname, '/views', 'about.html'));
 });
 
+router.post('/getColorTable', function(req, res) {
+	console.log("getColorTable");
+	
+	var jsonData = JSON.parse(fs.readFileSync(path.join(__dirname, "/public/resource/", "colorTable.json"), 'utf8'));
+	res.json(jsonData);
+	res.end();
+});
+
 router.post('/addHistory', function(req, res) {
 	console.log("addHistory called");
 	

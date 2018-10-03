@@ -9,6 +9,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var route = require('./route.js');
+var spawn = require("child_process").spawn;
 
 var app = express();
 var upload = multer();
@@ -26,9 +27,10 @@ app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 app.use('/css', express.static(__dirname + '/node_modules/sweetalert2/dist'));
 
 app.use('/static', express.static(__dirname + '/public'));
+app.use('/py', express.static(__dirname + '/py'));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 1000000}));
 app.use('/', route);
 
 app.use(function (req, res, next) {

@@ -383,14 +383,25 @@ def combination(flag):
 
 # 실행부
 
-priority_list, priority_score, priority_non_list = priority(True)
-Dday_list, Dday_score, Dday_non_list = Dday(True)
-comb_list, comb_score, comb_non_list = combination(True)
+def pso_result():
 
-Dday_optimal_score = 2 ** 63  # optimal
-pri_optimal_score = 2 ** 63  # optimal
-comb_optimal_score = 2 ** 63  # optimal
+    priority_list, priority_score, priority_non_list = priority(True)
+    Dday_list, Dday_score, Dday_non_list = Dday(True)
+    comb_list, comb_score, comb_non_list = combination(True)
 
-pre_priority_list, pre_priority_score, pre_priority_non_list = priority(False)
-pre_Dday_list, pre_Dday_score, pre_Dday_non_list = Dday(False)
-pre_comb_list, pre_comb_score, pre_comb_non_list = combination(False)
+    global Dday_optimal_score
+    global pri_optimal_score
+    global comb_optimal_score
+    Dday_optimal_score = 2 ** 63  # optimal
+    pri_optimal_score = 2 ** 63  # optimal
+    comb_optimal_score = 2 ** 63  # optimal
+
+    pre_priority_list, pre_priority_score, pre_priority_non_list = priority(False)
+    pre_Dday_list, pre_Dday_score, pre_Dday_non_list = Dday(False)
+    pre_comb_list, pre_comb_score, pre_comb_non_list = combination(False)
+
+    return priority_list, priority_score, priority_non_list, Dday_list, Dday_score, Dday_non_list, comb_list, comb_score, comb_non_list, pre_priority_list, pre_priority_score, pre_priority_non_list, pre_Dday_list, pre_Dday_score, pre_Dday_non_list, pre_comb_list, pre_comb_score, pre_comb_non_list
+
+
+
+

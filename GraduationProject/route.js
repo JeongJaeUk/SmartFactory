@@ -29,6 +29,23 @@ router.post('/getColorTable', function(req, res) {
 	res.end();
 });
 
+router.post('/removeHistory', function(req, res) {
+	console.log("removeHistory called");
+	
+	var fileName = req.body.fileName || req.query.fileName;
+	
+	//history 삭제
+	console.log(fileName);
+		
+	try {
+		fs.unlinkSync(path.join(__dirname, "/history/", fileName));		
+	} catch (e) {
+		// TODO: handle exception
+		console.log("err");
+		res.end('{"error" : "작업 계획 기록 삭제  실패"}');
+	}
+	res.end('{"success" : "작업 계획 기록 삭제 성공"}');
+});
 router.post('/addHistory', function(req, res) {
 	console.log("addHistory called");
 	

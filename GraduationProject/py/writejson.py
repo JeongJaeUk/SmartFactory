@@ -96,4 +96,3 @@ f = open("../saveresult/result.json", 'w')
 f.write(temp)
 f.close()
 
-print(temp)

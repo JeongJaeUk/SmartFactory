@@ -352,6 +352,7 @@ def priority(flag):
     pri_non = []
     works_p = sorted(pri_optimal_non_list, key=sort_by_job)
     temp_p = 0
+
     for p in works_p:
         if p[4] != temp_p:
             pri_non.append([p[6].split("_")[0], p[10], p[2], p[3], p[4], 1, p[8], p[9]])
@@ -365,7 +366,11 @@ def priority(flag):
     for i2 in range(len(temp2)):
         temp2[i2] = [pri_optimal_m_list[i2][1]]
         temp2[i2].append(1440 - pri_optimal_m_list[i2][0])
+<<<<<<< Updated upstream
         temp2[i2].append(len(pri_optimal_m_list[i2][1]))
+=======
+        temp2[i2].append(len(pri_optimal_m_list[i2][1])-1)
+>>>>>>> Stashed changes
     return temp2, optimal_score, pri_non
 
 
@@ -421,7 +426,6 @@ def combination(flag):
 # 실행부
 
 def pso_result():
-
     priority_list, priority_score, priority_non_list = priority(True)
     Dday_list, Dday_score, Dday_non_list = Dday(True)
     comb_list, comb_score, comb_non_list = combination(True)

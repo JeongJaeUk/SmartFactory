@@ -508,6 +508,9 @@
 		var addressNum = 1;
 		var addressAlpabet = 65; // A
 		var address = String.fromCharCode(addressAlpabet) + addressNum;
+
+		$("#work").find("thead").remove();
+		$("#work").find("tbody").remove();
 		
 		var table = $("#work");
 		
@@ -588,6 +591,10 @@
 		if(item_work_time[address] == undefined){
 			return;
 		}
+		
+		$("#machine").find("thead").remove();
+		$("#machine").find("tbody").remove();
+
 		
 		if(item_work_time[address].v == "품목명"){
 			addressNum++;
@@ -722,6 +729,9 @@
 		var addressAlpabet = 65; // A
 		var address = String.fromCharCode(addressAlpabet) + addressNum;
 		
+		$("#itemWorkTime").find("thead").remove();
+		$("#itemWorkTime").find("tbody").remove();
+		
 		var table = $("#itemWorkTime");
 		
 		var thead = $("<thead/>");
@@ -808,6 +818,9 @@
 		var addressNum = 1;
 		var addressAlpabet = 65; // A
 		var address = String.fromCharCode(addressAlpabet) + addressNum;
+		
+		$("#resetingTime").find("thead").remove();
+		$("#resetingTime").find("tbody").remove();
 		
 		var table = $("#resetingTime");
 		

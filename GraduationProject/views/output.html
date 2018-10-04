@@ -105,6 +105,7 @@
 			border-color: #357ebd; 
 			color: black;
 		}
+		.pointer {cursor: pointer;}
 	</style>
 </head>
 <body class="keen-dashboard" style="padding-top: 80px;">
@@ -195,7 +196,7 @@
 						<table class="table table-bordered table-hover" id="historyList">
 							<thead>
 								<tr>
-									<th>작업 계획 기록 파일명</th>
+									<th colspan="10">작업 계획 기록 파일명</th>
 								</tr>
 							</thead>
 						</table>
@@ -520,11 +521,11 @@
 			</div>
 			<div class="col-sm-6">
 				<div class="chart-wrapper">
-					<div class="chart-title">주문자 별 처리 물량 그래프</div>
+					<div class="chart-title">주문자별 처리 물량 그래프</div>
 					<div class="chart-stage">
 						<div id="AreaChartForOrder"></div>
 					</div>
-					<div class="chart-notes">주문자 별 총 처리 물량</div>
+					<div class="chart-notes">주문자별 총 처리 물량</div>
 				</div>
 			</div>
 			
@@ -662,7 +663,7 @@
 						if(dataByItem[key1[i]][key2[i]].hasOwnProperty(itemList[k])) {
 							if(dataByItem[key1[i]][key2[i]][itemList[k]].hasOwnProperty(j + 1)) {
 								dataByItem[key1[i]][key2[i]][itemList[k]][j + 1].forEach(function(work) {
-									totalTime += parseInt(work.orderNum);
+									totalTime += parseInt(work.count);
 								});
 							}
 						}
@@ -734,7 +735,7 @@
 				var totalTime = 0;
 				if(dataByOrder[key1[i]][key2[i]].hasOwnProperty(orderList[j])) {
 					dataByOrder[key1[i]][key2[i]][orderList[j]].forEach(function(work) {
-						totalTime += parseInt(work.orderNum);
+						totalTime += parseInt(work.count);
 					});
 				}		
 				column.push(totalTime);
@@ -1222,6 +1223,7 @@
 	}
 			
 	var createDayWorkTable = function(str) {
+		console.log(colorMap);
 		var key1 = str.split("_")[0];
 		var key2 = str.split("_")[1];
 		
@@ -1477,6 +1479,23 @@
 		});
 	}
 	
+	var removeHistory = function(fileName) {
+		$.ajax({
+			url: "/removeHistory",
+			type: "POST",
+			dataType: "JSON",
+			data: {fileName: fileName},
+			success: function(response) {
+				swal(response.success, "작업 계획 기록이 삭제 되었습니다.", "success");
+			}, error: function(reqeuse, status, error) {
+				swal(response.error, "작업 계획 기록이 삭제에 실패하였습니다. 다시 시도해 주십시오.", "error")
+			}
+		});
+		
+		
+		showHistory();
+	}
+	
 	var addHistory = function() {
 		var date = new Date();
 		var fileName = date.getFullYear().toString() + (date.getMonth() + 1).toString() + date.getDate().toString() 
@@ -1534,9 +1553,23 @@
 						text: fileName
 					});
 					
+					td.attr("colspan", 9);
 					td.attr('onClick', 'callHistory($(this).text())');
 					
 					tr.append(td);
+					
+					var tdRemove = $("<td/>", {
+						class: 'pointer'
+					});
+ 					var icon = $("<span/>");
+ 					icon.addClass("glyphicon glyphicon-remove");
+ 					tdRemove.append(icon);
+
+					
+					tdRemove.attr('onclick', "removeHistory('" + fileName + "')");
+					
+					tr.append(tdRemove);
+					
 					tbody.append(tr);
 				})
 				$("#historyList").append(tbody);

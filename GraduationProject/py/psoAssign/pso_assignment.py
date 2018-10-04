@@ -7,7 +7,7 @@ import sys
 
 input_json = './input.json'
 # input_json = json.loads(input_json)
-works, rest_time, machine_amount, sequence = extract_json(input_json)  # 엑셀에서 데이터를 가져 옴
+works, rest_time, machine_amount, sequence, available = extract_json(input_json)  # 엑셀에서 데이터를 가져 옴
 
 alpha = 0  # [[] for _ in range(machine_amount)]  # 전날 스케줄링 하지 않은 시간을 기록하기 위함.
 day = parse('20180811')
@@ -56,6 +56,15 @@ temp = 0
 repeat = 0
 temps = 0
 
+for i9, m in enumerate(works):
+    b = list(works[i9])
+    for h in available:
+        if m[6] == h[0]:
+            b[11] = h[1:]
+            continue
+    works[i9] = tuple(b)
+# print(works)
+
 for i5, w in enumerate(works):
     a = list(works[i5])
     for i6, n in enumerate(sequence):
@@ -80,6 +89,7 @@ for i8, u in enumerate(works):
     b = list(works[i8])
     b[7] = i8
     works[i8] = tuple(b)
+# print(works)
 
 
 ########################################################## 이까지는 공통으로 모두 work 처리함 ############################
@@ -98,7 +108,7 @@ def Pretreatment(work):
     m_list = [[1440, [], " "] for _ in range(0, machine_amount)]
     sort_work = sorted(work, key=sort_by_decimal)
     # sort_work = sorted(sort_works1, key=sort_by_jobnum)
-
+    sort_work2 = sort_work
     ##########################################################################
 
     # 변수 x를 기준으로 sort 된 리스트
@@ -109,52 +119,79 @@ def Pretreatment(work):
 
     # sort_work 가 while 문을 넘어서 갯수가 변하지 않으면 더이상 작업을 할 수 없다는 말임
 
-    for i3, w in enumerate(last_work):
-        last_work[i3][0] = 1440
 
-    while len(sort_work) != sort_work_len:
+    scheduled_list = []
+
+    scheduled_len = len(scheduled_list) + 1
+    fire = 0
+    while len(scheduled_list) != scheduled_len:
+
         i7 = 0
-        sort_work_len = len(sort_work)
-        # print(sort_work)
-        while i7 < len(sort_work):
-            # 조건 1 : 기계의 남은시간이 0 미만이 되는 작업은 입력 될 수 없다.
-            # 조건 2 : 작업끼리 겹치지 않기 위해서 한 작업의 마지막 작업시간보다 빠른 시간에는 입력 될 수 없다.
-            # 조건 3 : 같은 작업에서 공정 순서가 빠른 순서로만 입력된다. 뛰어넘는것도 불가능하다.
-            reset = ressetingTime(m_list[machine[sort_work[i7][7] - 1]][2], sort_work[i7][6].split("_")[0])
-            if m_list[machine[sort_work[i7][7] - 1]][0] - (sort_work[i7][0] + reset) >= 0 and \
-                    last_work[sort_work[i7][4] - 1][0] >= m_list[machine[sort_work[i7][7] - 1]][0] and \
-                    last_work[sort_work[i7][4] - 1][1] == int(sort_work[i7][6].split("_")[1]):
-                ###############################             조건            ###########################################
+        fire += 1
+        # print(fire)
 
-                start = 1440 - m_list[machine[sort_work[i7][7] - 1]][0]
-                # m_list 에 수행 된 작업의 정보를 입력한다. (작업번호, 작업이름, resetting 시간, 작업시작, 작업시간, 작업 끝난 시간)
-                m_list[machine[sort_work[i7][7] - 1]][1].append(
-                    [sort_work[i7][6].split("_")[0],
-                     sort_work[i7][4],
-                     int(sort_work[i7][6].split("_")[1]),
-                     sort_work[i7][0],
-                     reset,
-                     # start + reset,
-                     # 1440 - (m_list[machine[sort_work[i7][7] - 1]][0] - (reset + sort_work[i7][0])),
-                     sort_work[i7][8],
-                     sort_work[i7][9]]
-                )
+        scheduled_len = len(scheduled_list)
 
-                # m_list 의 시간에서 작업시간과 ressetingTime 을 뺀다.
-                m_list[machine[sort_work[i7][7] - 1]][0] -= (sort_work[i7][0] + reset)
+        for i7 in range(len(sort_work)):
+        # while i7 < len(sort_work):
+            for y in range(len(sort_work[i7][11])):
 
-                # m_list 에 가장 최근 수행 된 작업의 종류를 입력한다.
-                m_list[machine[sort_work[i7][7] - 1]][2] = sort_work[i7][6].split("_")[0]
-                # 작업번호를 기준으로 마지막으로 수행이 끝난 시간을 기록한다.
-                last_work[sort_work[i7][4] - 1][0] = m_list[machine[sort_work[i7][7] - 1]][0]
-                last_work[sort_work[i7][4] - 1][1] += 1
-                # if machine[sort_work[i7][7] - 1] == 0:
-                #     print("check")
-                del sort_work[i7]
-            else:
-                # non_scheduled_list.append(sort_work[i7][4])
-                i7 += 1
-    return sort_work, m_list
+                # 조건 1 : 기계의 남은시간이 0 미만이 되는 작업은 입력 될 수 없다.
+                # 조건 2 : 작업끼리 겹치지 않기 위해서 한 작업의 마지막 작업시간보다 빠른 시간에는 입력 될 수 없다.
+                # 조건 3 : 같은 작업에서 공정 순서가 빠른 순서로만 입력된다. 뛰어넘는것도 불가능하다.
+                # print("check")
+                # print(len(sort_work[i7][11]))
+                # print(int(sort_work[i7][5])-y)
+                # print(sort_work[i7][11][int(sort_work[i7][5])-y])
+                machine1 = sort_work[i7][11][int(sort_work[i7][5])-y] - 1
+                reset = ressetingTime(m_list[machine1][2], sort_work[i7][6].split("_")[0])
+                if m_list[machine1][0] - (sort_work[i7][0] + reset) >= 0 and \
+                        last_work[sort_work[i7][4] - 1][0] >= m_list[machine1][0] and \
+                        last_work[sort_work[i7][4] - 1][1] == int(sort_work[i7][6].split("_")[1]):
+                    ###############################             조건            ###########################################
+                    # print("check")
+                    # start = 1440 - m_list[machine1][0]
+                    # m_list 에 수행 된 작업의 정보를 입력한다. (작업번호, 작업이름, resetting 시간, 작업시작, 작업시간, 작업 끝난 시간)
+                    m_list[machine1][1].append(
+                        [sort_work[i7][6].split("_")[0],
+                         sort_work[i7][4],
+                         int(sort_work[i7][6].split("_")[1]),
+                         sort_work[i7][0],
+                         reset,
+                         # start + reset,
+                         # 1440 - (m_list[machine[sort_work[i7][7] - 1]][0] - (reset + sort_work[i7][0])),
+                         sort_work[i7][8],
+                         sort_work[i7][9]]
+                    )
+
+                    # m_list 의 시간에서 작업시간과 ressetingTime 을 뺀다.
+                    m_list[machine1][0] -= (sort_work[i7][0] + reset)
+
+                    # m_list 에 가장 최근 수행 된 작업의 종류를 입력한다.
+                    m_list[machine1][2] = sort_work[i7][6].split("_")[0]
+                    # 작업번호를 기준으로 마지막으로 수행이 끝난 시간을 기록한다.
+                    last_work[sort_work[i7][4] - 1][0] = m_list[machine1][0]
+                    last_work[sort_work[i7][4] - 1][1] += 1
+                    # if machine[sort_work[i7][7] - 1] == 0:
+                    #     print("check")
+
+                    scheduled_list.append(sort_work[i7][7])
+                    break
+                else:
+                    if y == len(sort_work[i7][11])-1:
+                        break
+    i8 = 0
+    # print(scheduled_list)
+    # print()
+    while i8 < len(sort_work2):
+        if sort_work2[i8][7] not in scheduled_list:
+            del sort_work2[i8]
+        else:
+            i8 += 1
+    # print(len(scheduled_list))
+    # print(m_list)
+
+    return sort_work2, m_list
 
 
 def print_result():
@@ -324,11 +361,11 @@ def priority(flag):
             pri_non[- 1] = tuple(b)
         temp_p = p[4]
 
-        temp2 = [[] for _ in range(0, len(pri_optimal_m_list))]
-        for i2 in range(len(temp2)):
-            temp2[i2] = [pri_optimal_m_list[i2][1]]
-            temp2[i2].append(1440 - pri_optimal_m_list[i2][0])
-            temp2[i2].append(len(pri_optimal_m_list[i2][1])-1)
+    temp2 = [[] for _ in range(0, len(pri_optimal_m_list))]
+    for i2 in range(len(temp2)):
+        temp2[i2] = [pri_optimal_m_list[i2][1]]
+        temp2[i2].append(1440 - pri_optimal_m_list[i2][0])
+        temp2[i2].append(len(pri_optimal_m_list[i2][1]))
     return temp2, optimal_score, pri_non
 
 
@@ -352,7 +389,7 @@ def Dday(flag):
     for i2 in range(len(temp2)):
         temp2[i2] = [Dday_optimal_m_list[i2][1]]
         temp2[i2].append(1440 - Dday_optimal_m_list[i2][0])
-        temp2[i2].append(len(Dday_optimal_m_list[i2][1])-1)
+        temp2[i2].append(len(Dday_optimal_m_list[i2][1]))
 
     return temp2, optimal_score, Dday_non
 
@@ -377,7 +414,7 @@ def combination(flag):
     for i2 in range(len(temp2)):
         temp2[i2] = [comb_optimal_m_list[i2][1]]
         temp2[i2].append(1440 - comb_optimal_m_list[i2][0])
-        temp2[i2].append(len(comb_optimal_m_list[i2][1])-1)
+        temp2[i2].append(len(comb_optimal_m_list[i2][1]))
     return temp2, optimal_score, comb_non
 
 
@@ -400,8 +437,7 @@ def pso_result():
     pre_Dday_list, pre_Dday_score, pre_Dday_non_list = Dday(False)
     pre_comb_list, pre_comb_score, pre_comb_non_list = combination(False)
 
+
     return priority_list, priority_score, priority_non_list, Dday_list, Dday_score, Dday_non_list, comb_list, comb_score, comb_non_list, pre_priority_list, pre_priority_score, pre_priority_non_list, pre_Dday_list, pre_Dday_score, pre_Dday_non_list, pre_comb_list, pre_comb_score, pre_comb_non_list
-
-
 
 

@@ -2,7 +2,7 @@ import numpy as np
 
 
 def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
-        swarmsize=10, omega=1.0, phip=1.0, phig=1.0, maxiter=10,
+        swarmsize=50, omega=1.0, phip=1.0, phig=1.0, maxiter=50,
         minstep=1e-8, minfunc=1e-8, debug=False, flag=True):
     """
     Perform a particle swarm optimization (PSO)
@@ -144,10 +144,35 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
             # violations, then update the objective function value
             x[i, :] = x[i, :] + v[i, :]
             mark1 = x[i, :] < lb
-            mark2 = x[i, :] > ub
+            mark2 = x[i, :] >= ub
+
+            # print(x[i, :])
+            temp = [0 for _ in range(len(list(mark2)))]
+            temp2 = list(mark2)
+            tempx = list(x[i, :])
+            tempu = list(ub)
+
+            for ite, torf in enumerate(temp2):
+                if torf == True:
+                    temp[ite] = divmod(tempx[ite], 1)[1] + tempu[ite] - 1 - tempx[ite]
+            # print(tempx)
+
+            tempr = np.array(temp)
+            # print(tempr)
             x[i, mark1] = lb[mark1]
-            x[i, mark2] = ub[mark2]
+            # x[i, mark2] = ub[mark2]
+            x[i, :] = x[i, :] + tempr
+            # print(x[i, :])
+            # print("test")
+            # print(x[i, :])
+            # print(ub)
+            # print(mark2)
+            # print(x[i, :])
+
+            # print(ub[mark2])
             fx = obj(x[i, :])
+
+
 
             # Compare particle's best position (if constraints are satisfied)
             if fx < fp[i] and is_feasible(x[i, :]):
